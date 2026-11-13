@@ -12,7 +12,7 @@
     <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
     <Setter Property="PlaceholderForeground" Value="{DynamicResource Mg.TextMutedBrush}" />
-    <Setter Property="SelectionBrush" Value="{DynamicResource Mg.AccentBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Mg.SelectionBrush}" />
     <Setter Property="SelectionForegroundBrush" Value="Transparent" />
     <Setter Property="CaretBrush" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />

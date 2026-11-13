@@ -115,6 +115,10 @@ public sealed class ProxyService
         {
             await ApplyAsync(session).ConfigureAwait(false);
         }
+        catch (InvalidOperationException) when (!session.IsStarted)
+        {
+            // Сессию закрыли, пока применяли прокси (выход, отмена входа) — ничего делать не нужно.
+        }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to apply proxy to account {AccountId}", session.AccountId);

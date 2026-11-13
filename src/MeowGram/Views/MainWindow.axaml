@@ -2,16 +2,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:MeowGram.ViewModels"
         xmlns:controls="using:MeowGram.Controls"
-        xmlns:l="using:MeowGram.Localization"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
         x:Class="MeowGram.Views.MainWindow"
         x:DataType="vm:MainViewModel"
+        x:CompileBindings="True"
         Icon="/Assets/avalonia-logo.ico"
         Title="MeowGram"
         Width="1200" Height="800"
-        MinWidth="1000" MinHeight="720"
+        MinWidth="1000" MinHeight="760"
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True">
 
@@ -20,19 +20,8 @@
   </Design.DataContext>
 
   <Grid RowDefinitions="Auto,*">
-    <!-- Содержимое под заголовком: тянется на всё окно, заголовок поверх. -->
-    <Grid Grid.Row="0" Grid.RowSpan="2">
-      <!-- Временная карточка: проверка шрифтов и токенов темы. Экран входа заменит её на этапе 4. -->
-      <Border Classes="card" Width="440" Height="580" HorizontalAlignment="Center" VerticalAlignment="Center"
-              Padding="36">
-        <StackPanel Spacing="12">
-          <TextBlock Classes="display" Text="MeowGram" />
-          <TextBlock Classes="title" Margin="0,16,0,0" Text="{l:Tr Login_QrTitle}" />
-          <TextBlock Classes="body secondary" Text="{l:Tr Login_QrSubtitle}" />
-        </StackPanel>
-      </Border>
-    </Grid>
-
+    <!-- Экран (вход или домашний) тянется на всё окно, свой заголовок — поверх. -->
+    <ContentControl Grid.Row="0" Grid.RowSpan="2" Content="{Binding Current}" />
     <controls:TitleBar Grid.Row="0" />
   </Grid>
 </Window>

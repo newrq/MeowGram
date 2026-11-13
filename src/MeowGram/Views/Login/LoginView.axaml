@@ -1,0 +1,512 @@
+<!--
+  Экран входа:
+  (1) карточка по центру — шаги входа с анимированными переходами;
+  (2) панель справа, низ вровень с карточкой — вырастает из нажатой круглой кнопки;
+  (3) круглые кнопки под панелью — язык, прокси, тема, аккаунты.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MeowGram.ViewModels.Login"
+             xmlns:controls="using:MeowGram.Controls"
+             xmlns:anim="using:MeowGram.Animation"
+             xmlns:l="using:MeowGram.Localization"
+             xmlns:accounts="using:MeowGram.Core.Accounts"
+             x:Class="MeowGram.Views.Login.LoginView"
+             x:DataType="vm:LoginViewModel"
+             x:CompileBindings="True"
+             Focusable="True">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="{DynamicResource Mg.FontCaption}" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    </Style>
+    <Style Selector="TextBlock.panelTitle">
+      <Setter Property="FontFamily" Value="{DynamicResource Mg.DisplayFont}" />
+      <Setter Property="FontSize" Value="22" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+    <Style Selector="TextBlock.error">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.ErrorBrush}" />
+      <Setter Property="FontSize" Value="{DynamicResource Mg.FontCaption}" />
+      <Setter Property="LineHeight" Value="18" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateY(-6px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="BackEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="TextBlock.error.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="translateY(0px)" />
+    </Style>
+    <Style Selector="Border.segments">
+      <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="3" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid x:Name="Root" RowDefinitions="*,Auto,*" Background="Transparent">
+
+    <!-- (1) Карточка входа -->
+    <Border Grid.Row="1" Classes="card" Width="440" Height="600" HorizontalAlignment="Center" ClipToBounds="True">
+      <TransitioningContentControl Content="{Binding CurrentStep}"
+                                   IsTransitionReversed="{Binding IsBack}"
+                                   Margin="36,32">
+        <TransitioningContentControl.PageTransition>
+          <anim:StepTransition />
+        </TransitioningContentControl.PageTransition>
+
+        <TransitioningContentControl.DataTemplates>
+
+          <!-- QR -->
+          <DataTemplate DataType="vm:QrStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <TextBlock Classes="display" Text="MeowGram" />
+                <TextBlock Classes="title" Margin="0,12,0,0" Text="{l:Tr Login_QrTitle}" />
+                <TextBlock Classes="body secondary" Text="{l:Tr Login_QrSubtitle}" />
+              </StackPanel>
+              <Button x:Name="UsePhoneButton" DockPanel.Dock="Bottom"
+                      Theme="{StaticResource Mg.SecondaryButton}" HorizontalAlignment="Stretch"
+                      Content="{l:Tr Login_UsePhone}" Command="{Binding Login.UsePhoneCommand}" />
+              <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,0,0,18">
+                <Grid ColumnDefinitions="22,*">
+                  <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="1" />
+                  <TextBlock Grid.Column="1" Classes="caption secondary" TextWrapping="Wrap" Text="{l:Tr Login_QrStep1}" />
+                </Grid>
+                <Grid ColumnDefinitions="22,*">
+                  <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="2" />
+                  <TextBlock Grid.Column="1" Classes="caption secondary" TextWrapping="Wrap" Text="{l:Tr Login_QrStep2}" />
+                </Grid>
+                <Grid ColumnDefinitions="22,*">
+                  <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="3" />
+                  <TextBlock Grid.Column="1" Classes="caption secondary" TextWrapping="Wrap" Text="{l:Tr Login_QrStep3}" />
+                </Grid>
+              </StackPanel>
+              <Panel>
+                <controls:QrCodeView Width="176" Height="176"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                                     Link="{Binding Login.QrLink}"
+                                     IsTorn="{Binding #UsePhoneButton.IsPointerOver}"
+                                     IconBrush="{DynamicResource Mg.TextBrush}" />
+                <TextBlock Classes="error" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center"
+                           Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+              </Panel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Номер телефона -->
+          <DataTemplate DataType="vm:PhoneStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <Button Theme="{StaticResource Mg.LinkButton}" Command="{Binding Login.UseQrCommand}" Classes="rise">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <controls:StrokeIcon Data="{StaticResource Icon.QrCode}" Width="16" Height="16" />
+                    <TextBlock Text="{l:Tr Login_UseQr}" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Classes="title rise" Margin="0,20,0,0" Text="{l:Tr Login_PhoneTitle}" />
+                <TextBlock Classes="body secondary rise" Text="{l:Tr Login_PhoneSubtitle}" />
+              </StackPanel>
+              <Button DockPanel.Dock="Bottom" Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" Classes="rise"
+                      IsDefault="True" Content="{l:Tr Login_Continue}"
+                      Command="{Binding Login.SubmitPhoneCommand}" IsEnabled="{Binding !Login.IsBusy}" />
+              <StackPanel Spacing="8" Margin="0,28,0,0">
+                <Grid ColumnDefinitions="*,Auto" Classes="rise">
+                  <TextBlock Classes="label" Text="{l:Tr Login_PhoneLabel}" />
+                  <TextBlock Grid.Column="1" Classes="label" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="{Binding Login.CountryName}" />
+                </Grid>
+                <controls:MeowTextBox Classes="rise" Text="{Binding Login.PhoneNumber}" HasError="{Binding Login.HasError}" />
+                <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Код -->
+          <DataTemplate DataType="vm:CodeStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <Button Theme="{StaticResource Mg.LinkButton}" Command="{Binding Login.ChangeNumberCommand}" Classes="rise">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <controls:StrokeIcon Data="{StaticResource Icon.ArrowLeft}" Width="16" Height="16" />
+                    <TextBlock Text="{l:Tr Login_ChangeNumber}" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Classes="title rise" Margin="0,20,0,0" Text="{l:Tr Login_CodeTitle}" />
+                <TextBlock Classes="body secondary rise" Text="{Binding Login.CodeDelivery}" />
+              </StackPanel>
+              <StackPanel DockPanel.Dock="Bottom" Classes="rise">
+                <Button Theme="{StaticResource Mg.LinkButton}" IsVisible="{Binding Login.CanResend}"
+                        Content="{Binding Login.ResendText}" Command="{Binding Login.ResendCommand}" />
+                <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}"
+                           IsVisible="{Binding !Login.CanResend}" Text="{Binding Login.ResendText}" />
+              </StackPanel>
+              <StackPanel Spacing="12" Margin="0,32,0,0">
+                <controls:CodeInput Classes="rise" IsVisible="{Binding Login.IsNumericCode}"
+                                    CodeLength="{Binding Login.CodeLength}"
+                                    Text="{Binding Login.Code}"
+                                    HasError="{Binding Login.HasError}"
+                                    CompletedCommand="{Binding Login.SubmitCodeCommand}" />
+                <StackPanel Spacing="12" IsVisible="{Binding !Login.IsNumericCode}">
+                  <TextBlock Classes="label" Text="{l:Tr Login_CodeWordLabel}" />
+                  <controls:MeowTextBox Text="{Binding Login.Code}" HasError="{Binding Login.HasError}" />
+                  <Button Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" IsDefault="True"
+                          Content="{l:Tr Login_Continue}" Command="{Binding Login.SubmitCodeCommand}" IsEnabled="{Binding !Login.IsBusy}" />
+                </StackPanel>
+                <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Облачный пароль -->
+          <DataTemplate DataType="vm:PasswordStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <TextBlock Classes="display" Text="MeowGram" />
+                <TextBlock Classes="title rise" Margin="0,12,0,0" Text="{l:Tr Login_PasswordTitle}" />
+                <TextBlock Classes="body secondary rise" Text="{l:Tr Login_PasswordSubtitle}" />
+              </StackPanel>
+              <Button DockPanel.Dock="Bottom" Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" Classes="rise"
+                      IsDefault="True" Content="{l:Tr Login_LogIn}"
+                      Command="{Binding Login.SubmitPasswordCommand}" IsEnabled="{Binding !Login.IsBusy}" />
+              <StackPanel Spacing="8" Margin="0,28,0,0">
+                <TextBlock Classes="label rise" Text="{l:Tr Login_PasswordLabel}" />
+                <controls:MeowTextBox Classes="rise" IsPrivate="True" Text="{Binding Login.Password}" HasError="{Binding Login.HasError}" />
+                <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="{Binding Login.PasswordHint}"
+                           IsVisible="{Binding Login.PasswordHint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+                <Button Theme="{StaticResource Mg.LinkButton}" Classes="rise" Margin="0,4,0,0"
+                        Content="{l:Tr Login_ForgotPassword}" Command="{Binding Login.ForgotPasswordCommand}" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Восстановление облачного пароля -->
+          <DataTemplate DataType="vm:PasswordRecoveryStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <Button Theme="{StaticResource Mg.LinkButton}" Command="{Binding Login.BackToPasswordCommand}" Classes="rise">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <controls:StrokeIcon Data="{StaticResource Icon.ArrowLeft}" Width="16" Height="16" />
+                    <TextBlock Text="{l:Tr Login_Back}" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Classes="title rise" Margin="0,16,0,0" Text="{l:Tr Login_RecoveryTitle}" />
+                <TextBlock Classes="body secondary rise" Text="{Binding Login.RecoveryEmailPattern, StringFormat={}{0}}" />
+              </StackPanel>
+              <Button DockPanel.Dock="Bottom" Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" Classes="rise"
+                      IsDefault="True" Content="{l:Tr Login_LogIn}"
+                      Command="{Binding Login.SubmitRecoveryCommand}" IsEnabled="{Binding !Login.IsBusy}" />
+              <StackPanel Spacing="6" Margin="0,20,0,0">
+                <TextBlock Classes="label rise" Text="{l:Tr Login_RecoveryCodeLabel}" />
+                <controls:MeowTextBox Classes="rise" Text="{Binding Login.RecoveryCode}" HasError="{Binding Login.HasError}" />
+                <TextBlock Classes="label rise" Margin="0,6,0,0" Text="{l:Tr Login_NewPasswordLabel}" />
+                <controls:MeowTextBox Classes="rise" IsPrivate="True" Text="{Binding Login.NewPassword}" />
+                <TextBlock Classes="label rise" Margin="0,6,0,0" Text="{l:Tr Login_NewHintLabel}" />
+                <controls:MeowTextBox Classes="rise" Text="{Binding Login.NewHint}" />
+                <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" TextWrapping="Wrap" Text="{l:Tr Login_RecoveryEmptyWarning}" />
+                <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Почта для входа -->
+          <DataTemplate DataType="vm:EmailStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <TextBlock Classes="display" Text="MeowGram" />
+                <TextBlock Classes="title rise" Margin="0,12,0,0" Text="{l:Tr Login_EmailTitle}" />
+                <TextBlock Classes="body secondary rise" Text="{l:Tr Login_EmailSubtitle}" />
+              </StackPanel>
+              <Button DockPanel.Dock="Bottom" Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" Classes="rise"
+                      IsDefault="True" Content="{l:Tr Login_Continue}"
+                      Command="{Binding Login.SubmitEmailCommand}" IsEnabled="{Binding !Login.IsBusy}" />
+              <StackPanel Spacing="8" Margin="0,28,0,0">
+                <TextBlock Classes="label rise" Text="{l:Tr Login_EmailLabel}" />
+                <controls:MeowTextBox Classes="rise" Text="{Binding Login.Email}" HasError="{Binding Login.HasError}" />
+                <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Код из письма -->
+          <DataTemplate DataType="vm:EmailCodeStep">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="display" Text="MeowGram" />
+              <TextBlock Classes="title rise" Margin="0,12,0,0" Text="{l:Tr Login_EmailCodeTitle}" />
+              <TextBlock Classes="body secondary rise" Text="{Binding Login.EmailCodeSubtitle}" />
+              <controls:CodeInput Classes="rise" Margin="0,24,0,0"
+                                  CodeLength="{Binding Login.EmailCodeLength}"
+                                  Text="{Binding Login.EmailCode}"
+                                  HasError="{Binding Login.HasError}"
+                                  CompletedCommand="{Binding Login.SubmitEmailCodeCommand}" />
+              <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+            </StackPanel>
+          </DataTemplate>
+
+          <!-- Регистрация -->
+          <DataTemplate DataType="vm:RegistrationStep">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Spacing="8">
+                <TextBlock Classes="title rise" Text="{l:Tr Login_RegisterTitle}" />
+                <TextBlock Classes="body secondary rise" Text="{l:Tr Login_RegisterSubtitle}" />
+              </StackPanel>
+              <StackPanel DockPanel.Dock="Bottom" Spacing="12" Classes="rise">
+                <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" TextWrapping="Wrap" Text="{l:Tr Login_TermsNote}" />
+                <Button Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" IsDefault="True"
+                        Content="{l:Tr Login_Register}" Command="{Binding Login.SubmitRegistrationCommand}" IsEnabled="{Binding !Login.IsBusy}" />
+              </StackPanel>
+              <StackPanel Spacing="8" Margin="0,24,0,0">
+                <TextBlock Classes="label rise" Text="{l:Tr Login_FirstNameLabel}" />
+                <controls:MeowTextBox Classes="rise" Text="{Binding Login.FirstName}" HasError="{Binding Login.HasError}" />
+                <TextBlock Classes="label rise" Margin="0,8,0,0" Text="{l:Tr Login_LastNameLabel}" />
+                <controls:MeowTextBox Classes="rise" Text="{Binding Login.LastName}" />
+                <TextBlock Classes="error" Classes.shown="{Binding Login.HasError}" Text="{Binding Login.ErrorText}" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+
+          <!-- Нужен Premium -->
+          <DataTemplate DataType="vm:PremiumStep">
+            <StackPanel Spacing="12">
+              <TextBlock Classes="display" Text="MeowGram" />
+              <TextBlock Classes="title rise" Margin="0,12,0,0" Text="{l:Tr Login_PremiumTitle}" />
+              <TextBlock Classes="body secondary rise" Text="{l:Tr Login_PremiumText}" />
+              <Button Theme="{StaticResource Mg.SecondaryButton}" HorizontalAlignment="Stretch" Margin="0,16,0,0"
+                      Content="{l:Tr Login_UseQr}" Command="{Binding Login.UseQrCommand}" />
+            </StackPanel>
+          </DataTemplate>
+
+          <!-- Нет ключей Telegram -->
+          <DataTemplate DataType="vm:NotConfiguredStep">
+            <StackPanel Spacing="12">
+              <TextBlock Classes="display" Text="MeowGram" />
+              <TextBlock Classes="title" Margin="0,12,0,0" Text="{l:Tr Login_NotConfiguredTitle}" />
+              <TextBlock Classes="body secondary" Text="{l:Tr Login_NotConfiguredText}" />
+            </StackPanel>
+          </DataTemplate>
+
+        </TransitioningContentControl.DataTemplates>
+      </TransitioningContentControl>
+    </Border>
+
+    <!-- (2) Панель: низ вровень с карточкой (та же строка и высота) -->
+    <controls:MorphPopup x:Name="Popup" Grid.Row="1"
+                         Width="300" Height="600"
+                         HorizontalAlignment="Right" Margin="0,0,32,0"
+                         Background="{DynamicResource Mg.SurfaceBrush}"
+                         IsOpen="{Binding Panels.IsOpen}"
+                         ContentKey="{Binding Panels.Active}">
+      <ContentControl Content="{Binding Panels.Content}" Padding="20">
+        <ContentControl.DataTemplates>
+
+          <!-- Язык -->
+          <DataTemplate DataType="vm:LanguagePanelModel">
+            <StackPanel Spacing="2">
+              <TextBlock Classes="panelTitle" Text="{l:Tr Panel_Language}" />
+              <ItemsControl ItemsSource="{Binding Options}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="vm:LanguageOption">
+                    <Button Theme="{StaticResource Mg.RowButton}"
+                            Command="{Binding $parent[ItemsControl].((vm:LanguagePanelModel)DataContext).SelectCommand}"
+                            CommandParameter="{Binding Code}">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                        <controls:StrokeIcon Grid.Column="1" Data="{StaticResource Icon.Check}" Width="18" Height="18"
+                                             IsVisible="{Binding IsSelected}" />
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DataTemplate>
+
+          <!-- Тема -->
+          <DataTemplate DataType="vm:ThemePanelModel">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="panelTitle" Text="{l:Tr Panel_Theme}" />
+              <TextBlock Classes="label" Text="{l:Tr Theme_Mode}" />
+              <Border Classes="segments">
+                <UniformGrid Columns="3">
+                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="themeMode" IsChecked="{Binding IsDark}" Content="{l:Tr Theme_Dark}" />
+                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="themeMode" IsChecked="{Binding IsLight}" Content="{l:Tr Theme_Light}" />
+                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="themeMode" IsChecked="{Binding IsSystem}" Content="{l:Tr Theme_System}" />
+                </UniformGrid>
+              </Border>
+              <TextBlock Classes="label" Margin="0,6,0,0" Text="{l:Tr Theme_Accent}" />
+              <ItemsControl ItemsSource="{Binding Accents}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel ItemSpacing="6" LineSpacing="6" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="vm:AccentOption">
+                    <Button Theme="{StaticResource Mg.Swatch}" Classes.selected="{Binding IsSelected}"
+                            Command="{Binding SelectCommand}" ToolTip.Tip="{Binding Title}"
+                            AutomationProperties.Name="{Binding Title}">
+                      <Panel>
+                        <Ellipse Fill="{Binding Brush}" IsVisible="{Binding !IsMono}" />
+                        <Ellipse IsVisible="{Binding IsMono}">
+                          <Ellipse.Fill>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                              <GradientStop Offset="0.5" Color="#D1D1D1" />
+                              <GradientStop Offset="0.5" Color="#141414" />
+                            </LinearGradientBrush>
+                          </Ellipse.Fill>
+                        </Ellipse>
+                      </Panel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="label" Margin="0,6,0,0" Text="{l:Tr Theme_Animations}" />
+              <Border Classes="segments">
+                <UniformGrid Columns="3">
+                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="animations" IsChecked="{Binding IsFull}" Content="{l:Tr Animations_Full}" />
+                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="animations" IsChecked="{Binding IsReduced}" Content="{l:Tr Animations_Reduced}" />
+                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="animations" IsChecked="{Binding IsOff}" Content="{l:Tr Animations_Off}" />
+                </UniformGrid>
+              </Border>
+            </StackPanel>
+          </DataTemplate>
+
+          <!-- Прокси -->
+          <DataTemplate DataType="vm:ProxyPanelModel">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="panelTitle" Text="{l:Tr Panel_Proxy}" />
+
+              <!-- Список -->
+              <StackPanel Spacing="2" IsVisible="{Binding !IsEditing}">
+                <Button Theme="{StaticResource Mg.RowButton}" Command="{Binding DisableCommand}">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{l:Tr Proxy_None}" VerticalAlignment="Center" />
+                    <controls:StrokeIcon Grid.Column="1" Data="{StaticResource Icon.Check}" Width="18" Height="18" IsVisible="{Binding NoProxy}" />
+                  </Grid>
+                </Button>
+                <ItemsControl ItemsSource="{Binding Items}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:ProxyItem">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <Button Theme="{StaticResource Mg.RowButton}" Command="{Binding EnableCommand}">
+                          <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2">
+                              <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                              <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="{Binding KindName}" />
+                            </StackPanel>
+                            <controls:StrokeIcon Grid.Column="1" Data="{StaticResource Icon.Check}" Width="18" Height="18"
+                                                 VerticalAlignment="Center" IsVisible="{Binding IsEnabled}" />
+                          </Grid>
+                        </Button>
+                        <Button Grid.Column="1" Theme="{StaticResource Mg.RowButton}" Padding="10" Margin="4,0,0,0"
+                                Command="{Binding RemoveCommand}" ToolTip.Tip="{l:Tr Proxy_Remove}"
+                                AutomationProperties.Name="{l:Tr Proxy_Remove}">
+                          <controls:StrokeIcon Data="{StaticResource Icon.Trash}" Width="16" Height="16"
+                                               Foreground="{DynamicResource Mg.TextMutedBrush}" />
+                        </Button>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Theme="{StaticResource Mg.SecondaryButton}" HorizontalAlignment="Stretch" Margin="0,8,0,0" Command="{Binding StartAddCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <controls:StrokeIcon Data="{StaticResource Icon.Plus}" Width="16" Height="16" />
+                    <TextBlock Text="{l:Tr Proxy_Add}" />
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+
+              <!-- Добавление -->
+              <StackPanel Spacing="8" IsVisible="{Binding IsEditing}">
+                <Border Classes="segments">
+                  <UniformGrid Columns="3">
+                    <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="proxyKind" IsChecked="{Binding IsSocks}" Content="SOCKS5" />
+                    <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="proxyKind" IsChecked="{Binding IsHttp}" Content="HTTP" />
+                    <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="proxyKind" IsChecked="{Binding IsMtProtoSelected}" Content="MTProto" />
+                  </UniformGrid>
+                </Border>
+                <Button Theme="{StaticResource Mg.LinkButton}" Content="{l:Tr Proxy_PasteLink}" Command="{Binding PasteLinkCommand}" />
+                <Grid ColumnDefinitions="*,8,90">
+                  <controls:MeowTextBox Height="44" FontSize="15" PlaceholderText="{l:Tr Proxy_Server}" Text="{Binding Server}" />
+                  <controls:MeowTextBox Grid.Column="2" Height="44" FontSize="15" PlaceholderText="{l:Tr Proxy_Port}" Text="{Binding Port}" />
+                </Grid>
+                <controls:MeowTextBox Height="44" FontSize="15" IsVisible="{Binding IsSocksOrHttp}" PlaceholderText="{l:Tr Proxy_Username}" Text="{Binding Username}" />
+                <controls:MeowTextBox Height="44" FontSize="15" IsVisible="{Binding IsSocksOrHttp}" IsPrivate="True" PlaceholderText="{l:Tr Proxy_Password}" Text="{Binding Password}" />
+                <controls:MeowTextBox Height="44" FontSize="15" IsVisible="{Binding IsMtProto}" IsPrivate="True" PlaceholderText="{l:Tr Proxy_Secret}" Text="{Binding Secret}" />
+                <TextBlock Classes="caption" TextWrapping="Wrap" Text="{Binding Status}"
+                           Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                           IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <Grid ColumnDefinitions="*,8,*" Margin="0,4,0,0">
+                  <Button Theme="{StaticResource Mg.SecondaryButton}" HorizontalAlignment="Stretch" Height="42" Content="{l:Tr Proxy_Test}" Command="{Binding TestCommand}" />
+                  <Button Grid.Column="2" Theme="{StaticResource Mg.PrimaryButton}" HorizontalAlignment="Stretch" Height="42" Content="{l:Tr Proxy_Save}" Command="{Binding SaveCommand}" />
+                </Grid>
+                <Button Theme="{StaticResource Mg.LinkButton}" HorizontalAlignment="Center" Content="{l:Tr Proxy_Cancel}" Command="{Binding CancelAddCommand}" />
+              </StackPanel>
+            </StackPanel>
+          </DataTemplate>
+
+          <!-- Аккаунты -->
+          <DataTemplate DataType="vm:AccountsPanelModel">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="panelTitle" Text="{l:Tr Panel_Accounts}" />
+              <TextBlock Classes="caption secondary" TextWrapping="Wrap" Text="{l:Tr Accounts_Hint}" />
+              <ItemsControl ItemsSource="{Binding Items}" Margin="0,6,0,0">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="accounts:AccountInfo">
+                    <Button Theme="{StaticResource Mg.RowButton}"
+                            Command="{Binding $parent[ItemsControl].((vm:AccountsPanelModel)DataContext).SwitchCommand}"
+                            CommandParameter="{Binding}">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Classes="caption" Foreground="{DynamicResource Mg.TextMutedBrush}" Text="{Binding PhoneNumber, StringFormat=+{0}}" />
+                      </StackPanel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DataTemplate>
+
+        </ContentControl.DataTemplates>
+      </ContentControl>
+    </controls:MorphPopup>
+
+    <!-- (3) Кнопки под панелью -->
+    <StackPanel x:Name="PanelButtons" Grid.Row="2" Orientation="Horizontal" Spacing="12"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,32,0">
+      <Button Theme="{StaticResource Mg.RoundButton}" Tag="0" Click="OnPanelButtonClick"
+              Classes.active="{Binding Panels.IsLanguageActive}"
+              Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Language}"
+              ToolTip.Tip="{l:Tr Panel_Language}" AutomationProperties.Name="{l:Tr Panel_Language}">
+        <controls:StrokeIcon Data="{StaticResource Icon.Globe}" />
+      </Button>
+      <Button Theme="{StaticResource Mg.RoundButton}" Tag="1" Click="OnPanelButtonClick"
+              Classes.active="{Binding Panels.IsProxyActive}"
+              Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Proxy}"
+              ToolTip.Tip="{l:Tr Panel_Proxy}" AutomationProperties.Name="{l:Tr Panel_Proxy}">
+        <controls:StrokeIcon Data="{StaticResource Icon.Shield}" />
+      </Button>
+      <Button Theme="{StaticResource Mg.RoundButton}" Tag="2" Click="OnPanelButtonClick"
+              Classes.active="{Binding Panels.IsThemeActive}"
+              Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Theme}"
+              ToolTip.Tip="{l:Tr Panel_Theme}" AutomationProperties.Name="{l:Tr Panel_Theme}">
+        <controls:StrokeIcon Data="{StaticResource Icon.Palette}" />
+      </Button>
+      <Button Theme="{StaticResource Mg.RoundButton}" Tag="3" Click="OnPanelButtonClick"
+              IsVisible="{Binding Panels.HasAccounts}"
+              Classes.active="{Binding Panels.IsAccountsActive}"
+              Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Accounts}"
+              ToolTip.Tip="{l:Tr Panel_Accounts}" AutomationProperties.Name="{l:Tr Panel_Accounts}">
+        <controls:StrokeIcon Data="{StaticResource Icon.Users}" />
+      </Button>
+    </StackPanel>
+  </Grid>
+</UserControl>

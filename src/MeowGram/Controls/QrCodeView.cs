@@ -29,10 +29,10 @@ public sealed class QrCodeView : Control
         AvaloniaProperty.Register<QrCodeView, bool>(nameof(IsSeparated));
 
     public static readonly StyledProperty<IBrush?> PaperBrushProperty =
-        AvaloniaProperty.Register<QrCodeView, IBrush?>(nameof(PaperBrush), new SolidColorBrush(Color.Parse("#FBFAFB")));
+        AvaloniaProperty.Register<QrCodeView, IBrush?>(nameof(PaperBrush), new SolidColorBrush(Color.Parse("#E8E8E8")));
 
     public static readonly StyledProperty<IBrush?> InkBrushProperty =
-        AvaloniaProperty.Register<QrCodeView, IBrush?>(nameof(InkBrush), new SolidColorBrush(Color.Parse("#261F32")));
+        AvaloniaProperty.Register<QrCodeView, IBrush?>(nameof(InkBrush), new SolidColorBrush(Color.Parse("#030303")));
 
     public static readonly StyledProperty<IBrush?> IconBrushProperty =
         AvaloniaProperty.Register<QrCodeView, IBrush?>(nameof(IconBrush), Brushes.White);

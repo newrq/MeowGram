@@ -24,30 +24,41 @@ public enum AnimationLevel
     Off,
 }
 
-/// <summary>Акцент на выбор пользователя. Все варианты проходят контраст ≥ 4.5:1 с белым текстом (ThemeContrastTests).</summary>
-public sealed record AccentPreset(string Id, Color Color)
+/// <summary>
+/// Акцент на выбор пользователя. <see cref="Mono"/> (по умолчанию) — монохром из палитры, свой в каждой теме
+/// (Tokens.axaml). Цветные — поверх обеих тем, белый текст на них ≥ 4.5:1.
+/// </summary>
+public sealed record AccentPreset(string Id, Color? Color)
 {
-    public static readonly AccentPreset Lavender = new("lavender", Color.Parse("#594BA0"));
+    public static readonly AccentPreset Mono = new("mono", null);
+
+    public static readonly AccentPreset Lavender = new("lavender", Avalonia.Media.Color.Parse("#594BA0"));
 
     public static IReadOnlyList<AccentPreset> All { get; } =
     [
+        Mono,
         Lavender,
-        new("lilac", Color.Parse("#7E4FB3")),
-        new("ocean", Color.Parse("#2F6FDE")),
-        new("mint", Color.Parse("#237A67")),
-        new("rose", Color.Parse("#B84D7A")),
-        new("amber", Color.Parse("#9A6418")),
+        new("lilac", Avalonia.Media.Color.Parse("#7E4FB3")),
+        new("ocean", Avalonia.Media.Color.Parse("#2F6FDE")),
+        new("mint", Avalonia.Media.Color.Parse("#237A67")),
+        new("rose", Avalonia.Media.Color.Parse("#B84D7A")),
+        new("amber", Avalonia.Media.Color.Parse("#9A6418")),
     ];
 
-    public static AccentPreset FromId(string? id) => All.FirstOrDefault(a => a.Id == id) ?? Lavender;
+    public static AccentPreset FromId(string? id) => All.FirstOrDefault(a => a.Id == id) ?? Mono;
+
+    public bool IsMono => Color is null;
 
     /// <summary>Наведение — +10% к белому.</summary>
-    public Color Hover => Mix(Color, Colors.White, 0.10);
+    public Avalonia.Media.Color Hover => Mix(Color ?? Colors.Gray, Colors.White, 0.10);
 
     /// <summary>Нажатие — +15% к чёрному.</summary>
-    public Color Pressed => Mix(Color, Colors.Black, 0.15);
+    public Avalonia.Media.Color Pressed => Mix(Color ?? Colors.Gray, Colors.Black, 0.15);
 
-    private static Color Mix(Color a, Color b, double t) => Color.FromRgb(
+    /// <summary>Выделение текста — акцент с прозрачностью 45%.</summary>
+    public Avalonia.Media.Color Selection => Avalonia.Media.Color.FromArgb(0x73, (Color ?? Colors.Gray).R, (Color ?? Colors.Gray).G, (Color ?? Colors.Gray).B);
+
+    private static Avalonia.Media.Color Mix(Avalonia.Media.Color a, Avalonia.Media.Color b, double t) => Avalonia.Media.Color.FromRgb(
         (byte)Math.Round(a.R + (b.R - a.R) * t),
         (byte)Math.Round(a.G + (b.G - a.G) * t),
         (byte)Math.Round(a.B + (b.B - a.B) * t));
@@ -55,7 +66,7 @@ public sealed record AccentPreset(string Id, Color Color)
 
 public sealed record ThemePreferences(ThemeMode Mode, AccentPreset Accent, AnimationLevel Animations)
 {
-    public static ThemePreferences Default { get; } = new(ThemeMode.Dark, AccentPreset.Lavender, AnimationLevel.Full);
+    public static ThemePreferences Default { get; } = new(ThemeMode.Dark, AccentPreset.Mono, AnimationLevel.Full);
 }
 
 /// <summary>
@@ -66,7 +77,7 @@ public sealed class ThemeService(ISettingsStore settings)
 {
     public ThemeMode Mode { get; private set; } = ThemeMode.Dark;
 
-    public AccentPreset Accent { get; private set; } = AccentPreset.Lavender;
+    public AccentPreset Accent { get; private set; } = AccentPreset.Mono;
 
     public AnimationLevel Animations => Motion.Level;
 
@@ -134,14 +145,30 @@ public sealed class ThemeService(ISettingsStore settings)
         if (Application.Current is not { } app)
             return;
 
-        // Записи верхнего уровня Application.Resources важнее словарей тем — акцент один для обеих тем.
+        string[] overridable =
+        [
+            "Mg.AccentBrush", "Mg.AccentHoverBrush", "Mg.AccentPressedBrush", "Mg.OnAccentBrush", "Mg.SelectionBrush",
+            "SystemAccentColor", "SystemAccentColorLight1", "SystemAccentColorDark1",
+        ];
+
         var resources = app.Resources;
-        resources["Mg.AccentBrush"] = new SolidColorBrush(accent.Color);
+        if (accent.Color is not { } color)
+        {
+            // Монохром: работают значения из словарей тем (у тёмной и светлой они разные).
+            foreach (var key in overridable)
+                resources.Remove(key);
+            return;
+        }
+
+        // Цветной акцент: записи верхнего уровня Application.Resources важнее словарей тем — один для обеих тем.
+        resources["Mg.AccentBrush"] = new SolidColorBrush(color);
         resources["Mg.AccentHoverBrush"] = new SolidColorBrush(accent.Hover);
         resources["Mg.AccentPressedBrush"] = new SolidColorBrush(accent.Pressed);
+        resources["Mg.OnAccentBrush"] = new SolidColorBrush(Color.Parse("#FBFAFB"));
+        resources["Mg.SelectionBrush"] = new SolidColorBrush(accent.Selection);
 
         // Стандартные контролы Fluent (фокус, выделение текста) — в тон акценту.
-        resources["SystemAccentColor"] = accent.Color;
+        resources["SystemAccentColor"] = color;
         resources["SystemAccentColorLight1"] = accent.Hover;
         resources["SystemAccentColorDark1"] = accent.Pressed;
     }

@@ -7,6 +7,7 @@ using MeowGram.Core.Telegram;
 using MeowGram.Localization;
 using MeowGram.Services;
 using MeowGram.ViewModels;
+using MeowGram.ViewModels.Login;
 using MeowGram.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,10 +38,9 @@ public partial class App : Application
 
             ApplySavedPreferences(Services);
 
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = Services.GetRequiredService<MainViewModel>(),
-            };
+            var main = Services.GetRequiredService<MainViewModel>();
+            desktop.MainWindow = new MainWindow { DataContext = main };
+            main.Initialize();
             desktop.Exit += (_, _) => StopHost();
         }
 
@@ -77,7 +77,9 @@ public partial class App : Application
         builder.Services.AddMeowGramCore();
         builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
         builder.Services.AddSingleton<ThemeService>();
-        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddSingleton<MainViewModel>();
+        builder.Services.AddTransient<LoginPanelsViewModel>();
+        builder.Services.AddTransient<LoginViewModel>();
 
         return builder.Build();
     }

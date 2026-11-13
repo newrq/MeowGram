@@ -3,8 +3,8 @@
   чтобы тему и акцент можно было менять на лету.
   Тёмная тема — основная палитра. Светлая — выведена из неё по тем же ролям.
   Кисти объявлены внутри каждой темы, чтобы работали и внутри ThemeVariantScope (превью темы в панели).
-  Акцентные кисти (Mg.Accent*Brush) ThemeService переопределяет под выбранный акцент.
-  Контраст проверяется тестом ThemeContrastTests.
+  По умолчанию акцент монохромный (свой в каждой теме); цветной акцент ThemeService
+  ставит поверх (Mg.Accent*Brush, Mg.OnAccentBrush, Mg.SelectionBrush).
 -->
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -12,20 +12,21 @@
   <ResourceDictionary.ThemeDictionaries>
 
     <ResourceDictionary x:Key="Dark">
-      <Color x:Key="Mg.Bg">#261F32</Color>             <!-- фон окна -->
-      <Color x:Key="Mg.Surface">#41394F</Color>        <!-- карточка входа, панели -->
-      <Color x:Key="Mg.Inset">#261F32</Color>          <!-- поля ввода, круглые кнопки: «утоплены» в карточку -->
-      <Color x:Key="Mg.Line">#625D73</Color>           <!-- границы, наведение -->
-      <Color x:Key="Mg.Text">#FBFAFB</Color>           <!-- основной текст -->
-      <Color x:Key="Mg.TextSecondary">#C7C4CB</Color>  <!-- подписи на карточке: #FBFAFB 72% на #41394F, 6:1 -->
-      <Color x:Key="Mg.TextMuted">#86819E</Color>      <!-- иконки, плейсхолдеры, текст на фоне окна -->
-      <Color x:Key="Mg.Accent">#594BA0</Color>
-      <Color x:Key="Mg.AccentHover">#6A5DAA</Color>
-      <Color x:Key="Mg.AccentPressed">#4C4088</Color>
-      <Color x:Key="Mg.OnAccent">#FBFAFB</Color>
+      <Color x:Key="Mg.Bg">#141414</Color>  <!-- фон окна -->
+      <Color x:Key="Mg.Surface">#2B2B2B</Color>  <!-- карточка входа, панели, круглые кнопки -->
+      <Color x:Key="Mg.Inset">#030303</Color>  <!-- поля ввода, ячейки кода: тёмные «прорези» в карточке -->
+      <Color x:Key="Mg.Line">#434343</Color>  <!-- границы, наведение -->
+      <Color x:Key="Mg.Text">#D1D1D1</Color>  <!-- основной текст -->
+      <Color x:Key="Mg.TextSecondary">#A3A3A3</Color>  <!-- подписи на карточке: #D1D1D1 72% на #2B2B2B, 5.6:1 -->
+      <Color x:Key="Mg.TextMuted">#828383</Color>  <!-- иконки, плейсхолдеры, текст на фоне окна -->
+      <Color x:Key="Mg.Accent">#D1D1D1</Color>  <!-- монохромный акцент: светлая главная кнопка -->
+      <Color x:Key="Mg.AccentHover">#E0E0E0</Color>
+      <Color x:Key="Mg.AccentPressed">#B2B2B2</Color>
+      <Color x:Key="Mg.OnAccent">#141414</Color>
+      <Color x:Key="Mg.Selection">#59D1D1D1</Color>  <!-- выделение текста: акцент 35% -->
       <Color x:Key="Mg.Error">#F29A8C</Color>
       <Color x:Key="Mg.Success">#7FD6AE</Color>
-      <Color x:Key="Mg.Shadow">#66120E1A</Color>
+      <Color x:Key="Mg.Shadow">#80000000</Color>
 
       <SolidColorBrush x:Key="Mg.BgBrush" Color="{StaticResource Mg.Bg}" />
       <SolidColorBrush x:Key="Mg.SurfaceBrush" Color="{StaticResource Mg.Surface}" />
@@ -38,26 +39,28 @@
       <SolidColorBrush x:Key="Mg.AccentHoverBrush" Color="{StaticResource Mg.AccentHover}" />
       <SolidColorBrush x:Key="Mg.AccentPressedBrush" Color="{StaticResource Mg.AccentPressed}" />
       <SolidColorBrush x:Key="Mg.OnAccentBrush" Color="{StaticResource Mg.OnAccent}" />
+      <SolidColorBrush x:Key="Mg.SelectionBrush" Color="{StaticResource Mg.Selection}" />
       <SolidColorBrush x:Key="Mg.ErrorBrush" Color="{StaticResource Mg.Error}" />
       <SolidColorBrush x:Key="Mg.SuccessBrush" Color="{StaticResource Mg.Success}" />
       <SolidColorBrush x:Key="Mg.ChromeCloseHoverBrush" Color="#C42B1C" />
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Light">
-      <Color x:Key="Mg.Bg">#F4F2F8</Color>
+      <Color x:Key="Mg.Bg">#F3F3F3</Color>
       <Color x:Key="Mg.Surface">#FFFFFF</Color>
-      <Color x:Key="Mg.Inset">#EEEBF4</Color>
-      <Color x:Key="Mg.Line">#DCD7E6</Color>
-      <Color x:Key="Mg.Text">#261F32</Color>
-      <Color x:Key="Mg.TextSecondary">#625D73</Color>
-      <Color x:Key="Mg.TextMuted">#86819E</Color>
-      <Color x:Key="Mg.Accent">#594BA0</Color>
-      <Color x:Key="Mg.AccentHover">#6A5DAA</Color>
-      <Color x:Key="Mg.AccentPressed">#4C4088</Color>
-      <Color x:Key="Mg.OnAccent">#FBFAFB</Color>
+      <Color x:Key="Mg.Inset">#EDEDED</Color>
+      <Color x:Key="Mg.Line">#D6D6D6</Color>
+      <Color x:Key="Mg.Text">#141414</Color>
+      <Color x:Key="Mg.TextSecondary">#434343</Color>
+      <Color x:Key="Mg.TextMuted">#828383</Color>
+      <Color x:Key="Mg.Accent">#2B2B2B</Color>  <!-- монохромный акцент: тёмная главная кнопка -->
+      <Color x:Key="Mg.AccentHover">#434343</Color>
+      <Color x:Key="Mg.AccentPressed">#141414</Color>
+      <Color x:Key="Mg.OnAccent">#FFFFFF</Color>
+      <Color x:Key="Mg.Selection">#402B2B2B</Color>
       <Color x:Key="Mg.Error">#B3412F</Color>
       <Color x:Key="Mg.Success">#1E7A55</Color>
-      <Color x:Key="Mg.Shadow">#26261F32</Color>
+      <Color x:Key="Mg.Shadow">#26000000</Color>
 
       <SolidColorBrush x:Key="Mg.BgBrush" Color="{StaticResource Mg.Bg}" />
       <SolidColorBrush x:Key="Mg.SurfaceBrush" Color="{StaticResource Mg.Surface}" />
@@ -70,6 +73,7 @@
       <SolidColorBrush x:Key="Mg.AccentHoverBrush" Color="{StaticResource Mg.AccentHover}" />
       <SolidColorBrush x:Key="Mg.AccentPressedBrush" Color="{StaticResource Mg.AccentPressed}" />
       <SolidColorBrush x:Key="Mg.OnAccentBrush" Color="{StaticResource Mg.OnAccent}" />
+      <SolidColorBrush x:Key="Mg.SelectionBrush" Color="{StaticResource Mg.Selection}" />
       <SolidColorBrush x:Key="Mg.ErrorBrush" Color="{StaticResource Mg.Error}" />
       <SolidColorBrush x:Key="Mg.SuccessBrush" Color="{StaticResource Mg.Success}" />
       <SolidColorBrush x:Key="Mg.ChromeCloseHoverBrush" Color="#C42B1C" />

@@ -69,8 +69,9 @@ public sealed class TelegramSession : IAsyncDisposable
 
             client = new TdClient();
             ConfigureLogging(client);
-            client.UpdateReceived += OnUpdateReceived;
+            // Сначала запоминаем клиента, потом подписываемся: первое обновление приходит с фонового потока сразу.
             _client = client;
+            client.UpdateReceived += OnUpdateReceived;
         }
 
         // Первое UpdateAuthorizationState может прийти до подписки — запрашиваем состояние явно.
@@ -142,6 +143,10 @@ public sealed class TelegramSession : IAsyncDisposable
                 _closed.TrySetResult();
                 break;
 
+            case TdApi.AuthorizationState.AuthorizationStateClosing:
+            case TdApi.AuthorizationState.AuthorizationStateLoggingOut:
+                break;
+
             default:
                 if (Interlocked.Exchange(ref _initializedRaised, 1) == 0)
                     Initialized?.Invoke(this, EventArgs.Empty);
@@ -153,12 +158,16 @@ public sealed class TelegramSession : IAsyncDisposable
 
     private async Task SendTdlibParametersAsync()
     {
+        // Сессию могли уже закрыть — тогда параметры не нужны.
+        if (_client is not { } client)
+            return;
+
         try
         {
             Directory.CreateDirectory(_paths.TdlibDatabaseDirectory);
             Directory.CreateDirectory(_paths.TdlibFilesDirectory);
 
-            await Client.ExecuteAsync(new TdApi.SetTdlibParameters
+            await client.ExecuteAsync(new TdApi.SetTdlibParameters
             {
                 UseTestDc = _options.UseTestDc,
                 DatabaseDirectory = _paths.TdlibDatabaseDirectory,

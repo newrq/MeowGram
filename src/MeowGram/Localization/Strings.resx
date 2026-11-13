@@ -14,4 +14,110 @@
   <data name="Login_QrStep2" xml:space="preserve"><value>Перейдите в «Настройки» → «Устройства»</value></data>
   <data name="Login_QrStep3" xml:space="preserve"><value>Нажмите «Подключить устройство» и наведите камеру на код</value></data>
   <data name="Login_UsePhone" xml:space="preserve"><value>Войти по номеру телефона</value></data>
+  <data name="Login_UseQr" xml:space="preserve"><value>Войти по QR-коду</value></data>
+  <data name="Login_Connecting" xml:space="preserve"><value>Подключаемся к Telegram…</value></data>
+  <data name="Login_PhoneTitle" xml:space="preserve"><value>Номер телефона</value></data>
+  <data name="Login_PhoneSubtitle" xml:space="preserve"><value>Введите номер, на который зарегистрирован Telegram, вместе с кодом страны</value></data>
+  <data name="Login_PhoneLabel" xml:space="preserve"><value>Номер</value></data>
+  <data name="Login_CountryUnknown" xml:space="preserve"><value>Страна не определена</value></data>
+  <data name="Login_Continue" xml:space="preserve"><value>Продолжить</value></data>
+  <data name="Login_CodeTitle" xml:space="preserve"><value>Введите код</value></data>
+  <data name="Login_CodeViaApp" xml:space="preserve"><value>Код отправлен в Telegram на другом вашем устройстве</value></data>
+  <data name="Login_CodeViaSms" xml:space="preserve"><value>Код отправлен по SMS на {0}</value></data>
+  <data name="Login_CodeViaCall" xml:space="preserve"><value>Вам позвонят на {0} и продиктуют код</value></data>
+  <data name="Login_CodeViaFlashCall" xml:space="preserve"><value>Введите последние цифры номера, с которого поступит звонок на {0}</value></data>
+  <data name="Login_CodeViaFragment" xml:space="preserve"><value>Код отправлен в Fragment для номера {0}</value></data>
+  <data name="Login_CodeViaOther" xml:space="preserve"><value>Код отправлен на {0}</value></data>
+  <data name="Login_CodeWordLabel" xml:space="preserve"><value>Код</value></data>
+  <data name="Login_ChangeNumber" xml:space="preserve"><value>Изменить номер</value></data>
+  <data name="Login_ResendIn" xml:space="preserve"><value>Отправить ещё раз через {0}</value></data>
+  <data name="Login_ResendSms" xml:space="preserve"><value>Отправить код по SMS</value></data>
+  <data name="Login_ResendCall" xml:space="preserve"><value>Позвонить с кодом</value></data>
+  <data name="Login_Resend" xml:space="preserve"><value>Отправить код ещё раз</value></data>
+  <data name="Login_PasswordTitle" xml:space="preserve"><value>Облачный пароль</value></data>
+  <data name="Login_PasswordSubtitle" xml:space="preserve"><value>У аккаунта включена двухэтапная проверка</value></data>
+  <data name="Login_PasswordLabel" xml:space="preserve"><value>Пароль</value></data>
+  <data name="Login_PasswordHint" xml:space="preserve"><value>Подсказка: {0}</value></data>
+  <data name="Login_ForgotPassword" xml:space="preserve"><value>Забыли пароль?</value></data>
+  <data name="Login_LogIn" xml:space="preserve"><value>Войти</value></data>
+  <data name="Login_RecoveryTitle" xml:space="preserve"><value>Восстановление пароля</value></data>
+  <data name="Login_RecoverySubtitle" xml:space="preserve"><value>Код отправлен на почту {0}</value></data>
+  <data name="Login_RecoveryCodeLabel" xml:space="preserve"><value>Код из письма</value></data>
+  <data name="Login_NewPasswordLabel" xml:space="preserve"><value>Новый пароль</value></data>
+  <data name="Login_NewHintLabel" xml:space="preserve"><value>Подсказка к паролю (необязательно)</value></data>
+  <data name="Login_RecoveryEmptyWarning" xml:space="preserve"><value>Если оставить новый пароль пустым, двухэтапная проверка отключится</value></data>
+  <data name="Login_NoRecoveryEmail" xml:space="preserve"><value>Почта для восстановления не задана. Восстановить пароль можно в приложении Telegram, где вы уже вошли</value></data>
+  <data name="Login_Back" xml:space="preserve"><value>Назад</value></data>
+  <data name="Login_EmailTitle" xml:space="preserve"><value>Почта для входа</value></data>
+  <data name="Login_EmailSubtitle" xml:space="preserve"><value>Telegram просит указать почту: на неё будут приходить коды входа</value></data>
+  <data name="Login_EmailLabel" xml:space="preserve"><value>Почта</value></data>
+  <data name="Login_EmailCodeTitle" xml:space="preserve"><value>Код из письма</value></data>
+  <data name="Login_EmailCodeSubtitle" xml:space="preserve"><value>Код отправлен на {0}</value></data>
+  <data name="Login_RegisterTitle" xml:space="preserve"><value>Новый аккаунт</value></data>
+  <data name="Login_RegisterSubtitle" xml:space="preserve"><value>На этот номер ещё нет аккаунта Telegram. Укажите имя, чтобы создать его</value></data>
+  <data name="Login_FirstNameLabel" xml:space="preserve"><value>Имя</value></data>
+  <data name="Login_LastNameLabel" xml:space="preserve"><value>Фамилия (необязательно)</value></data>
+  <data name="Login_Register" xml:space="preserve"><value>Создать аккаунт</value></data>
+  <data name="Login_TermsNote" xml:space="preserve"><value>Нажимая «Создать аккаунт», вы принимаете условия использования Telegram</value></data>
+  <data name="Login_PremiumTitle" xml:space="preserve"><value>Нужен Telegram Premium</value></data>
+  <data name="Login_PremiumText" xml:space="preserve"><value>Для регистрации с этим номером Telegram требует Premium. Оформите его в официальном приложении и попробуйте снова</value></data>
+  <data name="Login_NotConfiguredTitle" xml:space="preserve"><value>Нет ключей Telegram</value></data>
+  <data name="Login_NotConfiguredText" xml:space="preserve"><value>Укажите api_id и api_hash в файле appsettings.Local.json рядом с программой и перезапустите MeowGram</value></data>
+  <data name="Error_PhoneNumberInvalid" xml:space="preserve"><value>Неверный номер. Проверьте код страны и цифры</value></data>
+  <data name="Error_PhoneNumberBanned" xml:space="preserve"><value>Этот номер заблокирован в Telegram</value></data>
+  <data name="Error_CodeInvalid" xml:space="preserve"><value>Неверный код. Проверьте и введите ещё раз</value></data>
+  <data name="Error_CodeExpired" xml:space="preserve"><value>Код устарел. Запросите новый</value></data>
+  <data name="Error_PasswordInvalid" xml:space="preserve"><value>Неверный пароль</value></data>
+  <data name="Error_EmailInvalid" xml:space="preserve"><value>Неверный адрес почты</value></data>
+  <data name="Error_NameInvalid" xml:space="preserve"><value>Проверьте имя</value></data>
+  <data name="Error_TooManyRequests" xml:space="preserve"><value>Слишком много попыток. Повторите через {0}</value></data>
+  <data name="Error_TooManyRequestsLater" xml:space="preserve"><value>Слишком много попыток. Повторите позже</value></data>
+  <data name="Error_ApiIdInvalid" xml:space="preserve"><value>Неверные api_id или api_hash. Проверьте appsettings.Local.json</value></data>
+  <data name="Error_Unknown" xml:space="preserve"><value>Не получилось: {0}</value></data>
+  <data name="Panel_Language" xml:space="preserve"><value>Язык</value></data>
+  <data name="Panel_Proxy" xml:space="preserve"><value>Прокси</value></data>
+  <data name="Panel_Theme" xml:space="preserve"><value>Тема</value></data>
+  <data name="Panel_Accounts" xml:space="preserve"><value>Аккаунты</value></data>
+  <data name="Language_Russian" xml:space="preserve"><value>Русский</value></data>
+  <data name="Language_English" xml:space="preserve"><value>English</value></data>
+  <data name="Proxy_None" xml:space="preserve"><value>Без прокси</value></data>
+  <data name="Proxy_Add" xml:space="preserve"><value>Добавить прокси</value></data>
+  <data name="Proxy_Server" xml:space="preserve"><value>Сервер</value></data>
+  <data name="Proxy_Port" xml:space="preserve"><value>Порт</value></data>
+  <data name="Proxy_Username" xml:space="preserve"><value>Логин (необязательно)</value></data>
+  <data name="Proxy_Password" xml:space="preserve"><value>Пароль (необязательно)</value></data>
+  <data name="Proxy_Secret" xml:space="preserve"><value>Секрет</value></data>
+  <data name="Proxy_PasteLink" xml:space="preserve"><value>Вставить ссылку</value></data>
+  <data name="Proxy_LinkInvalid" xml:space="preserve"><value>В буфере обмена нет ссылки на прокси</value></data>
+  <data name="Proxy_Test" xml:space="preserve"><value>Проверить</value></data>
+  <data name="Proxy_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Proxy_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Proxy_Testing" xml:space="preserve"><value>Проверяем…</value></data>
+  <data name="Proxy_TestOk" xml:space="preserve"><value>Работает, {0} мс</value></data>
+  <data name="Proxy_TestFailed" xml:space="preserve"><value>Не работает: {0}</value></data>
+  <data name="Proxy_Remove" xml:space="preserve"><value>Удалить прокси</value></data>
+  <data name="Proxy_FieldsRequired" xml:space="preserve"><value>Укажите сервер и порт</value></data>
+  <data name="Proxy_SecretRequired" xml:space="preserve"><value>Для MTProto нужен секрет</value></data>
+  <data name="Proxy_NeedSession" xml:space="preserve"><value>Проверка доступна, когда MeowGram подключается к Telegram</value></data>
+  <data name="Theme_Mode" xml:space="preserve"><value>Оформление</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Тёмная</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Светлая</value></data>
+  <data name="Theme_System" xml:space="preserve"><value>Как в системе</value></data>
+  <data name="Theme_Accent" xml:space="preserve"><value>Акцент</value></data>
+  <data name="Theme_Animations" xml:space="preserve"><value>Анимации</value></data>
+  <data name="Animations_Full" xml:space="preserve"><value>Полные</value></data>
+  <data name="Animations_Reduced" xml:space="preserve"><value>Меньше</value></data>
+  <data name="Animations_Off" xml:space="preserve"><value>Выкл.</value></data>
+  <data name="Accent_mono" xml:space="preserve"><value>Монохром</value></data>
+  <data name="Accent_lavender" xml:space="preserve"><value>Лаванда</value></data>
+  <data name="Accent_lilac" xml:space="preserve"><value>Сирень</value></data>
+  <data name="Accent_ocean" xml:space="preserve"><value>Океан</value></data>
+  <data name="Accent_mint" xml:space="preserve"><value>Мята</value></data>
+  <data name="Accent_rose" xml:space="preserve"><value>Роза</value></data>
+  <data name="Accent_amber" xml:space="preserve"><value>Янтарь</value></data>
+  <data name="Accounts_Hint" xml:space="preserve"><value>Аккаунты, в которые вы уже вошли. Нажмите, чтобы вернуться</value></data>
+  <data name="Home_Title" xml:space="preserve"><value>Вы вошли</value></data>
+  <data name="Home_Subtitle" xml:space="preserve"><value>Здесь скоро будут чаты</value></data>
+  <data name="Home_LogOut" xml:space="preserve"><value>Выйти из аккаунта</value></data>
+  <data name="Home_AddAccount" xml:space="preserve"><value>Добавить аккаунт</value></data>
 </root>

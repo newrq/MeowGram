@@ -118,4 +118,75 @@
     </Style>
   </ControlTheme>
 
+
+  <!--
+    Элементы панелей: сегментный переключатель (Mg.Segment — RadioButton внутри Border.segments),
+    строка списка (Mg.RowButton), кружок акцента (Mg.Swatch).
+  -->
+
+  <ControlTheme x:Key="Mg.Segment" TargetType="RadioButton">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Height" Value="34" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontCaption}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Border" Background="{TemplateBinding Background}" CornerRadius="10">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.18" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            Foreground="{TemplateBinding Foreground}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^:checked">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+      <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="Mg.RowButton" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.99)" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="Mg.Swatch" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="^.selected /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+  </ControlTheme>
 </ResourceDictionary>
