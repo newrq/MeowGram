@@ -486,6 +486,5 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-# WTelegramClient: session holds account auth keys, never commit
-*.session
-WTelegram.log
+# Local secrets (Telegram api_id/api_hash)
+appsettings.Local.json

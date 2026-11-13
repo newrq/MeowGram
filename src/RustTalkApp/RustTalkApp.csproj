@@ -10,6 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- appsettings.Local.json — локальные секреты (api_id/api_hash), в .gitignore -->
+    <None Update="appsettings.json;appsettings.Local.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AsyncImageLoader.Avalonia" Version="4.0.0" />
     <PackageReference Include="Avalonia" Version="12.1.6" />
     <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
@@ -23,6 +28,7 @@
     <PackageReference Include="LibVLCSharp" Version="3.10.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.15" />
     <PackageReference Include="SkiaSharp.Skottie" Version="3.119.4" />
+    <PackageReference Include="tdlib.native" Version="1.8.69" />
     <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.2" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.24" />
   </ItemGroup>

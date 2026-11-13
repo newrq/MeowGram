@@ -3,7 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using RustTalkApp.Core;
+using RustTalkApp.Core.Telegram;
 using RustTalkApp.ViewModels;
 using RustTalkApp.Views;
 
@@ -41,9 +43,18 @@ public partial class App : Application
 
     private static IHost CreateHost()
     {
-        var builder = Host.CreateApplicationBuilder();
+        var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
+        {
+            // appsettings*.json лежат рядом с exe, а не в текущей папке запуска.
+            ContentRootPath = AppContext.BaseDirectory,
+        });
+
+        builder.Configuration
+            .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables(prefix: "RUSTTALK_");
 
         builder.Services.AddRustTalkCore();
+        builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
         builder.Services.AddTransient<MainViewModel>();
 
         return builder.Build();
