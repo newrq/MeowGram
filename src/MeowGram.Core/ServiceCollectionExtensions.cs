@@ -1,15 +1,18 @@
+using MeowGram.Core.Accounts;
+using MeowGram.Core.Data;
+using MeowGram.Core.Proxies;
+using MeowGram.Core.Security;
+using MeowGram.Core.Settings;
+using MeowGram.Core.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MeowGram.Core.Data;
-using MeowGram.Core.Security;
-using MeowGram.Core.Telegram;
 
 namespace MeowGram.Core;
 
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Регистрирует сервисы ядра: пути к данным, локальную БД и TDLib.
+    /// Регистрирует сервисы ядра: пути, нашу БД (с миграциями при старте), настройки, аккаунты TDLib и прокси.
     /// <see cref="TelegramOptions"/> настраивает вызывающий код (из конфигурации).
     /// </summary>
     public static IServiceCollection AddMeowGramCore(this IServiceCollection services, AppPaths? paths = null)
@@ -21,9 +24,14 @@ public static class ServiceCollectionExtensions
             options.UseSqlite($"Data Source={paths.DatabasePath}"));
 
         services.AddOptions<TelegramOptions>();
-        services.AddSingleton(new DatabaseKeyStore(paths.TdlibKeyPath));
-        services.AddSingleton<TelegramClientService>();
-        services.AddHostedService<TelegramHostedService>();
+        services.AddSingleton<SecretProtector>();
+        services.AddSingleton<ISettingsStore, SettingsStore>();
+        services.AddSingleton<AccountManager>();
+        services.AddSingleton<ProxyService>();
+
+        // Порядок важен: сначала миграции БД, затем запуск аккаунтов.
+        services.AddHostedService<DatabaseInitializer>();
+        services.AddHostedService<AccountManagerHostedService>();
 
         return services;
     }

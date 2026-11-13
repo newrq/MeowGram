@@ -65,8 +65,13 @@ public partial class App : Application
         if (_host is null)
             return;
 
-        _host.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-        _host.Dispose();
+        // Ядро освобождается асинхронно (TDLib нужно корректно закрыть), синхронный Dispose бросил бы исключение.
+        // Внутри ядра везде ConfigureAwait(false), поэтому ожидание из UI-потока не блокируется.
+        _host.StopAsync(TimeSpan.FromSeconds(10)).GetAwaiter().GetResult();
+        if (_host is IAsyncDisposable asyncDisposable)
+            asyncDisposable.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        else
+            _host.Dispose();
         _host = null;
     }
 }
