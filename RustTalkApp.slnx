@@ -1,6 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/RustTalkApp.Core/RustTalkApp.Core.csproj" />
-    <Project Path="src/RustTalkApp/RustTalkApp.csproj" />
-  </Folder>
-</Solution>

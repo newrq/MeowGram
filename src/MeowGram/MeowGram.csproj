@@ -34,6 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RustTalkApp.Core\RustTalkApp.Core.csproj" />
+    <ProjectReference Include="..\MeowGram.Core\MeowGram.Core.csproj" />
   </ItemGroup>
 </Project>

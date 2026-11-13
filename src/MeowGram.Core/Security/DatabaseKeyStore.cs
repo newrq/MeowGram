@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace RustTalkApp.Core.Security;
+namespace MeowGram.Core.Security;
 
 /// <summary>
 /// Хранит случайный ключ шифрования базы TDLib.
@@ -10,7 +10,7 @@ namespace RustTalkApp.Core.Security;
 public sealed class DatabaseKeyStore(string keyPath)
 {
     private const int KeySize = 32;
-    private static readonly byte[] Entropy = "RustTalkApp.TdlibDatabaseKey"u8.ToArray();
+    private static readonly byte[] Entropy = "MeowGram.TdlibDatabaseKey"u8.ToArray();
 
     public byte[] GetOrCreateKey()
     {

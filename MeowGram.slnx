@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MeowGram.Core/MeowGram.Core.csproj" />
+    <Project Path="src/MeowGram/MeowGram.csproj" />
+  </Folder>
+</Solution>

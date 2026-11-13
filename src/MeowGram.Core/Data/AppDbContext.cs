@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace RustTalkApp.Core.Data;
+namespace MeowGram.Core.Data;
 
 /// <summary>
 /// Локальный кэш клиента (чаты, сообщения, настройки кастомизации).

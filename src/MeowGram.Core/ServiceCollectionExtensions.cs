@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RustTalkApp.Core.Data;
-using RustTalkApp.Core.Security;
-using RustTalkApp.Core.Telegram;
+using MeowGram.Core.Data;
+using MeowGram.Core.Security;
+using MeowGram.Core.Telegram;
 
-namespace RustTalkApp.Core;
+namespace MeowGram.Core;
 
 public static class ServiceCollectionExtensions
 {
@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     /// Регистрирует сервисы ядра: пути к данным, локальную БД и TDLib.
     /// <see cref="TelegramOptions"/> настраивает вызывающий код (из конфигурации).
     /// </summary>
-    public static IServiceCollection AddRustTalkCore(this IServiceCollection services, AppPaths? paths = null)
+    public static IServiceCollection AddMeowGramCore(this IServiceCollection services, AppPaths? paths = null)
     {
         paths ??= AppPaths.Default();
 

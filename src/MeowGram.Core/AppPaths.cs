@@ -1,4 +1,4 @@
-namespace RustTalkApp.Core;
+namespace MeowGram.Core;
 
 /// <summary>
 /// Пути к пользовательским данным приложения: наша БД и данные TDLib.
@@ -11,15 +11,15 @@ public sealed class AppPaths
         Directory.CreateDirectory(RootDirectory);
     }
 
-    /// <summary>По умолчанию: %LocalAppData%/RustTalkApp (Windows), ~/.local/share/RustTalkApp (Linux), ~/Library/Application Support/RustTalkApp (macOS).</summary>
+    /// <summary>По умолчанию: %LocalAppData%/MeowGram (Windows), ~/.local/share/MeowGram (Linux), ~/Library/Application Support/MeowGram (macOS).</summary>
     public static AppPaths Default() => new(Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
-        "RustTalkApp"));
+        "MeowGram"));
 
     public string RootDirectory { get; }
 
     /// <summary>Наша БД: настройки кастомизации и собственные данные клиента (чаты и сообщения хранит TDLib).</summary>
-    public string DatabasePath => Path.Combine(RootDirectory, "rusttalk.db");
+    public string DatabasePath => Path.Combine(RootDirectory, "meowgram.db");
 
     /// <summary>База TDLib (зашифрована ключом из <see cref="TdlibKeyPath"/>).</summary>
     public string TdlibDatabaseDirectory => Path.Combine(RootDirectory, "tdlib", "db");

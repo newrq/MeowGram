@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace RustTalkApp.Views;
+namespace MeowGram.Views;
 
 public partial class MainWindow : Window
 {

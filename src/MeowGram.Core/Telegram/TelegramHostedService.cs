@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace RustTalkApp.Core.Telegram;
+namespace MeowGram.Core.Telegram;
 
 /// <summary>Запускает TDLib вместе с хостом приложения и закрывает при остановке.</summary>
 internal sealed class TelegramHostedService(TelegramClientService telegram) : IHostedService

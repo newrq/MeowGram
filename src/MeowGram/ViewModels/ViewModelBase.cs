@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace RustTalkApp.ViewModels;
+namespace MeowGram.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject
 {

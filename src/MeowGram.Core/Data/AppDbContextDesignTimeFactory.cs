@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace RustTalkApp.Core.Data;
+namespace MeowGram.Core.Data;
 
 /// <summary>Используется только инструментом dotnet-ef при создании миграций.</summary>
 internal sealed class AppDbContextDesignTimeFactory : IDesignTimeDbContextFactory<AppDbContext>

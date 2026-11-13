@@ -3,10 +3,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RustTalkApp.Core.Security;
+using MeowGram.Core.Security;
 using TdLib;
 
-namespace RustTalkApp.Core.Telegram;
+namespace MeowGram.Core.Telegram;
 
 /// <summary>
 /// Владеет единственным <see cref="TdClient"/>: запускает TDLib, передаёт ему параметры

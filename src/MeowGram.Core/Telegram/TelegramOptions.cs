@@ -1,8 +1,8 @@
-namespace RustTalkApp.Core.Telegram;
+namespace MeowGram.Core.Telegram;
 
 /// <summary>
 /// Настройки подключения к Telegram. Секция "Telegram" в appsettings.Local.json
-/// или переменные окружения RUSTTALK_Telegram__ApiId / RUSTTALK_Telegram__ApiHash.
+/// или переменные окружения MEOWGRAM_Telegram__ApiId / MEOWGRAM_Telegram__ApiHash.
 /// </summary>
 public sealed class TelegramOptions
 {

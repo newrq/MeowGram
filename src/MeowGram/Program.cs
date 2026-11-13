@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace RustTalkApp;
+namespace MeowGram;
 
 sealed class Program
 {

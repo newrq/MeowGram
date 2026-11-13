@@ -4,12 +4,12 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using RustTalkApp.Core;
-using RustTalkApp.Core.Telegram;
-using RustTalkApp.ViewModels;
-using RustTalkApp.Views;
+using MeowGram.Core;
+using MeowGram.Core.Telegram;
+using MeowGram.ViewModels;
+using MeowGram.Views;
 
-namespace RustTalkApp;
+namespace MeowGram;
 
 public partial class App : Application
 {
@@ -51,9 +51,9 @@ public partial class App : Application
 
         builder.Configuration
             .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
-            .AddEnvironmentVariables(prefix: "RUSTTALK_");
+            .AddEnvironmentVariables(prefix: "MEOWGRAM_");
 
-        builder.Services.AddRustTalkCore();
+        builder.Services.AddMeowGramCore();
         builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
         builder.Services.AddTransient<MainViewModel>();
 
