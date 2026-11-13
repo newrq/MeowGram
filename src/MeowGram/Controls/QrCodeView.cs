@@ -50,13 +50,19 @@ public sealed class QrCodeView : Control
     private TimeSpan _refreshAt;
     private bool _refreshing;
 
+    static QrCodeView()
+    {
+        // Метаданные свойства задаются один раз на тип. В конструкторе экземпляра второй QR
+        // (возврат на шаг QR) падал с «Metadata is already set» — и карточка оставалась пустой.
+        WidthProperty.OverrideDefaultValue<QrCodeView>(208);
+        HeightProperty.OverrideDefaultValue<QrCodeView>(208);
+    }
+
     public QrCodeView()
     {
         _clock = new FrameClock(this, IsAnimating);
         var random = new Random(42);
         _fiberLengths = Enumerable.Range(0, 64).Select(_ => 1.5 + random.NextDouble() * 4).ToArray();
-        WidthProperty.OverrideDefaultValue<QrCodeView>(208);
-        HeightProperty.OverrideDefaultValue<QrCodeView>(208);
         ClipToBounds = false;
     }
 

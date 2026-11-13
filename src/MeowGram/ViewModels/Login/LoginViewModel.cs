@@ -265,7 +265,10 @@ public sealed partial class LoginViewModel : ViewModelBase, IAsyncDisposable
     });
 
     [RelayCommand]
-    private Task SubmitCodeAsync() => RunAsync(() => Auth.CheckCodeAsync(Code.Trim()), onError: () => Code = string.Empty);
+    // Код приходит параметром от ячеек: в момент последней цифры привязка ещё не обновила Code,
+    // и без параметра в Telegram уходил код без последней цифры («неверный код»).
+    private Task SubmitCodeAsync(string? code) =>
+        RunAsync(() => Auth.CheckCodeAsync((string.IsNullOrEmpty(code) ? Code : code).Trim()), onError: () => Code = string.Empty);
 
     [RelayCommand]
     private Task ResendAsync() => RunAsync(() => Auth.ResendCodeAsync());
@@ -311,7 +314,8 @@ public sealed partial class LoginViewModel : ViewModelBase, IAsyncDisposable
     private Task SubmitEmailAsync() => RunAsync(() => Auth.SetEmailAddressAsync(Email.Trim()));
 
     [RelayCommand]
-    private Task SubmitEmailCodeAsync() => RunAsync(() => Auth.CheckEmailCodeAsync(EmailCode.Trim()), onError: () => EmailCode = string.Empty);
+    private Task SubmitEmailCodeAsync(string? code) =>
+        RunAsync(() => Auth.CheckEmailCodeAsync((string.IsNullOrEmpty(code) ? EmailCode : code).Trim()), onError: () => EmailCode = string.Empty);
 
     [RelayCommand]
     private Task SubmitRegistrationAsync() => RunAsync(() => Auth.RegisterAsync(FirstName.Trim(), LastName.Trim()));
