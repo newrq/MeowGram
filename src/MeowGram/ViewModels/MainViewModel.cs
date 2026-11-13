@@ -1,9 +1,6 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-
 namespace MeowGram.ViewModels;
 
+/// <summary>Главное окно. Экран входа и чаты появятся на следующих этапах.</summary>
 public partial class MainViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    public partial string Greeting { get; set; } = "Welcome to Avalonia!";
 }

@@ -1,0 +1,11 @@
+<!--
+  Контурные иконки (сетка 24×24, обводка 2px). Пути — из Lucide (https://lucide.dev, лицензия ISC),
+  см. THIRD-PARTY-NOTICES.md. Рисуются через Path со Stroke, без заливки.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StreamGeometry x:Key="Icon.Minus">M5 12h14</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Square">M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Restore">M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2</StreamGeometry>
+  <StreamGeometry x:Key="Icon.X">M18 6 6 18 M6 6l12 12</StreamGeometry>
+</ResourceDictionary>

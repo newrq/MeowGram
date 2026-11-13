@@ -1,0 +1,48 @@
+<!-- Базовые стили MeowGram поверх Fluent: шрифты, цвета текста, классы типографики. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource Mg.BgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Mg.BodyFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontBody}" />
+  </Style>
+
+  <!-- Типографика. -->
+  <Style Selector="TextBlock.display">
+    <Setter Property="FontFamily" Value="{DynamicResource Mg.DisplayFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontDisplay}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LineHeight" Value="40" />
+  </Style>
+  <Style Selector="TextBlock.title">
+    <Setter Property="FontFamily" Value="{DynamicResource Mg.DisplayFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontTitle}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LineHeight" Value="32" />
+  </Style>
+  <Style Selector="TextBlock.body">
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontBody}" />
+    <Setter Property="LineHeight" Value="22" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.secondary">
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.caption">
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontCaption}" />
+    <Setter Property="LineHeight" Value="18" />
+  </Style>
+
+  <!-- Карточка (1) и панель (2) экрана входа. -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Mg.CardRadius}" />
+    <Setter Property="BoxShadow" Value="0 24 64 0 #40120E1A" />
+  </Style>
+  <Style Selector="Border.panel">
+    <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Mg.PanelRadius}" />
+  </Style>
+</Styles>

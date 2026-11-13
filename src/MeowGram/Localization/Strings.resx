@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Window_Minimize" xml:space="preserve"><value>Свернуть</value></data>
+  <data name="Window_Maximize" xml:space="preserve"><value>Развернуть</value></data>
+  <data name="Window_Restore" xml:space="preserve"><value>Восстановить</value></data>
+  <data name="Window_Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Login_QrTitle" xml:space="preserve"><value>Вход по QR-коду</value></data>
+  <data name="Login_QrSubtitle" xml:space="preserve"><value>Отсканируйте код телефоном, на котором вы уже вошли в Telegram</value></data>
+  <data name="Login_QrStep1" xml:space="preserve"><value>Откройте Telegram на телефоне</value></data>
+  <data name="Login_QrStep2" xml:space="preserve"><value>Перейдите в «Настройки» → «Устройства»</value></data>
+  <data name="Login_QrStep3" xml:space="preserve"><value>Нажмите «Подключить устройство» и наведите камеру на код</value></data>
+  <data name="Login_UsePhone" xml:space="preserve"><value>Войти по номеру телефона</value></data>
+</root>

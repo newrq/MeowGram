@@ -1,0 +1,97 @@
+<!--
+  Токены темы MeowGram. Всё оформление берёт цвета, скругления и шрифты только отсюда (через DynamicResource),
+  чтобы тему и акцент можно было менять на лету.
+  Тёмная тема — основная палитра. Светлая — выведена из неё по тем же ролям.
+  Кисти объявлены внутри каждой темы, чтобы работали и внутри ThemeVariantScope (превью темы в панели).
+  Акцентные кисти (Mg.Accent*Brush) ThemeService переопределяет под выбранный акцент.
+  Контраст проверяется тестом ThemeContrastTests.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ResourceDictionary.ThemeDictionaries>
+
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="Mg.Bg">#261F32</Color>             <!-- фон окна -->
+      <Color x:Key="Mg.Surface">#41394F</Color>        <!-- карточка входа, панели -->
+      <Color x:Key="Mg.Inset">#261F32</Color>          <!-- поля ввода, круглые кнопки: «утоплены» в карточку -->
+      <Color x:Key="Mg.Line">#625D73</Color>           <!-- границы, наведение -->
+      <Color x:Key="Mg.Text">#FBFAFB</Color>           <!-- основной текст -->
+      <Color x:Key="Mg.TextSecondary">#C7C4CB</Color>  <!-- подписи на карточке: #FBFAFB 72% на #41394F, 6:1 -->
+      <Color x:Key="Mg.TextMuted">#86819E</Color>      <!-- иконки, плейсхолдеры, текст на фоне окна -->
+      <Color x:Key="Mg.Accent">#594BA0</Color>
+      <Color x:Key="Mg.AccentHover">#6A5DAA</Color>
+      <Color x:Key="Mg.AccentPressed">#4C4088</Color>
+      <Color x:Key="Mg.OnAccent">#FBFAFB</Color>
+      <Color x:Key="Mg.Error">#F29A8C</Color>
+      <Color x:Key="Mg.Success">#7FD6AE</Color>
+      <Color x:Key="Mg.Shadow">#66120E1A</Color>
+
+      <SolidColorBrush x:Key="Mg.BgBrush" Color="{StaticResource Mg.Bg}" />
+      <SolidColorBrush x:Key="Mg.SurfaceBrush" Color="{StaticResource Mg.Surface}" />
+      <SolidColorBrush x:Key="Mg.InsetBrush" Color="{StaticResource Mg.Inset}" />
+      <SolidColorBrush x:Key="Mg.LineBrush" Color="{StaticResource Mg.Line}" />
+      <SolidColorBrush x:Key="Mg.TextBrush" Color="{StaticResource Mg.Text}" />
+      <SolidColorBrush x:Key="Mg.TextSecondaryBrush" Color="{StaticResource Mg.TextSecondary}" />
+      <SolidColorBrush x:Key="Mg.TextMutedBrush" Color="{StaticResource Mg.TextMuted}" />
+      <SolidColorBrush x:Key="Mg.AccentBrush" Color="{StaticResource Mg.Accent}" />
+      <SolidColorBrush x:Key="Mg.AccentHoverBrush" Color="{StaticResource Mg.AccentHover}" />
+      <SolidColorBrush x:Key="Mg.AccentPressedBrush" Color="{StaticResource Mg.AccentPressed}" />
+      <SolidColorBrush x:Key="Mg.OnAccentBrush" Color="{StaticResource Mg.OnAccent}" />
+      <SolidColorBrush x:Key="Mg.ErrorBrush" Color="{StaticResource Mg.Error}" />
+      <SolidColorBrush x:Key="Mg.SuccessBrush" Color="{StaticResource Mg.Success}" />
+      <SolidColorBrush x:Key="Mg.ChromeCloseHoverBrush" Color="#C42B1C" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="Mg.Bg">#F4F2F8</Color>
+      <Color x:Key="Mg.Surface">#FFFFFF</Color>
+      <Color x:Key="Mg.Inset">#EEEBF4</Color>
+      <Color x:Key="Mg.Line">#DCD7E6</Color>
+      <Color x:Key="Mg.Text">#261F32</Color>
+      <Color x:Key="Mg.TextSecondary">#625D73</Color>
+      <Color x:Key="Mg.TextMuted">#86819E</Color>
+      <Color x:Key="Mg.Accent">#594BA0</Color>
+      <Color x:Key="Mg.AccentHover">#6A5DAA</Color>
+      <Color x:Key="Mg.AccentPressed">#4C4088</Color>
+      <Color x:Key="Mg.OnAccent">#FBFAFB</Color>
+      <Color x:Key="Mg.Error">#B3412F</Color>
+      <Color x:Key="Mg.Success">#1E7A55</Color>
+      <Color x:Key="Mg.Shadow">#26261F32</Color>
+
+      <SolidColorBrush x:Key="Mg.BgBrush" Color="{StaticResource Mg.Bg}" />
+      <SolidColorBrush x:Key="Mg.SurfaceBrush" Color="{StaticResource Mg.Surface}" />
+      <SolidColorBrush x:Key="Mg.InsetBrush" Color="{StaticResource Mg.Inset}" />
+      <SolidColorBrush x:Key="Mg.LineBrush" Color="{StaticResource Mg.Line}" />
+      <SolidColorBrush x:Key="Mg.TextBrush" Color="{StaticResource Mg.Text}" />
+      <SolidColorBrush x:Key="Mg.TextSecondaryBrush" Color="{StaticResource Mg.TextSecondary}" />
+      <SolidColorBrush x:Key="Mg.TextMutedBrush" Color="{StaticResource Mg.TextMuted}" />
+      <SolidColorBrush x:Key="Mg.AccentBrush" Color="{StaticResource Mg.Accent}" />
+      <SolidColorBrush x:Key="Mg.AccentHoverBrush" Color="{StaticResource Mg.AccentHover}" />
+      <SolidColorBrush x:Key="Mg.AccentPressedBrush" Color="{StaticResource Mg.AccentPressed}" />
+      <SolidColorBrush x:Key="Mg.OnAccentBrush" Color="{StaticResource Mg.OnAccent}" />
+      <SolidColorBrush x:Key="Mg.ErrorBrush" Color="{StaticResource Mg.Error}" />
+      <SolidColorBrush x:Key="Mg.SuccessBrush" Color="{StaticResource Mg.Success}" />
+      <SolidColorBrush x:Key="Mg.ChromeCloseHoverBrush" Color="#C42B1C" />
+    </ResourceDictionary>
+
+  </ResourceDictionary.ThemeDictionaries>
+
+  <!-- Шрифты: Playfair Display — надпись MeowGram, заголовки, цифры кода; Onest — всё остальное. -->
+  <FontFamily x:Key="Mg.DisplayFont">fonts:MeowGram#Playfair Display</FontFamily>
+  <FontFamily x:Key="Mg.BodyFont">fonts:MeowGram#Onest</FontFamily>
+
+  <x:Double x:Key="Mg.FontCaption">13</x:Double>
+  <x:Double x:Key="Mg.FontBody">15</x:Double>
+  <x:Double x:Key="Mg.FontInput">17</x:Double>
+  <x:Double x:Key="Mg.FontTitle">26</x:Double>
+  <x:Double x:Key="Mg.FontDisplay">34</x:Double>
+
+  <!-- Скругления: крупные, как в макете входа. -->
+  <CornerRadius x:Key="Mg.CardRadius">32</CornerRadius>
+  <CornerRadius x:Key="Mg.PanelRadius">28</CornerRadius>
+  <CornerRadius x:Key="Mg.InputRadius">14</CornerRadius>
+  <CornerRadius x:Key="Mg.ButtonRadius">14</CornerRadius>
+
+  <x:Double x:Key="Mg.TitleBarHeight">40</x:Double>
+</ResourceDictionary>
