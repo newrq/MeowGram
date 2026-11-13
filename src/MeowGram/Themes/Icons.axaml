@@ -1,6 +1,6 @@
 <!--
   Контурные иконки (сетка 24×24, обводка 2px). Пути — из Lucide (https://lucide.dev, лицензия ISC),
-  см. THIRD-PARTY-NOTICES.md. Рисуются через Path со Stroke, без заливки.
+  см. THIRD-PARTY-NOTICES.md. Рисуются через Path со Stroke (класс Path.icon), без заливки.
 -->
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -8,4 +8,17 @@
   <StreamGeometry x:Key="Icon.Square">M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z</StreamGeometry>
   <StreamGeometry x:Key="Icon.Restore">M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2</StreamGeometry>
   <StreamGeometry x:Key="Icon.X">M18 6 6 18 M6 6l12 12</StreamGeometry>
+
+  <StreamGeometry x:Key="Icon.Globe">M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0z M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20 M2 12h20</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Shield">M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Palette">M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z M13.5 6a.5.5 0 1 0 0 1 .5.5 0 1 0 0-1z M17.5 10a.5.5 0 1 0 0 1 .5.5 0 1 0 0-1z M6.5 12a.5.5 0 1 0 0 1 .5.5 0 1 0 0-1z M8.5 7a.5.5 0 1 0 0 1 .5.5 0 1 0 0-1z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Users">M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Eye">M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0 M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.EyeOff">M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49 M14.084 14.158a3 3 0 0 1-4.242-4.242 M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143 M2 2l20 20</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Smartphone">M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z M12 18h.01</StreamGeometry>
+  <StreamGeometry x:Key="Icon.ArrowLeft">m12 19-7-7 7-7 M19 12H5</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Check">M20 6 9 17l-5-5</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Plus">M5 12h14 M12 5v14</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Trash">M3 6h18 M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6 M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2</StreamGeometry>
+  <StreamGeometry x:Key="Icon.QrCode">M4 3h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z M15 3h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z M4 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1z M14 14h3 M21 14v.01 M14 17v4 M17 17h4v4 M21 21h-.01</StreamGeometry>
 </ResourceDictionary>

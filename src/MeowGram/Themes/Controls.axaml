@@ -1,0 +1,121 @@
+<!--
+  Оформление кнопок MeowGram (ControlTheme, без шаблонов Fluent):
+  Mg.PrimaryButton — главное действие (акцент), Mg.SecondaryButton — второстепенное (на карточке),
+  Mg.LinkButton — текстовая ссылка, Mg.RoundButton — круглая кнопка нижнего ряда экрана входа.
+  Наведение — плавная смена фона, нажатие — сжатие до 97%.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ControlTheme x:Key="Mg.ButtonBase" TargetType="Button">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontBody}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="RenderTransform" Value="scale(1)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" Easing="CubicEaseOut" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.12" />
+              <BrushTransition Property="BorderBrush" Duration="0:0:0.12" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Foreground="{TemplateBinding Foreground}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.97)" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="Mg.PrimaryButton" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Padding" Value="20,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Mg.ButtonRadius}" />
+    <Setter Property="Background" Value="{DynamicResource Mg.AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.AccentHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.AccentPressedBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="Mg.SecondaryButton" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Padding" Value="20,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Mg.ButtonRadius}" />
+    <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="Mg.LinkButton" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.98)" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Круглая кнопка (3) под панелью: на фоне окна, поэтому цвета карточки. Класс .active — её панель открыта. -->
+  <ControlTheme x:Key="Mg.RoundButton" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
+    <Setter Property="Width" Value="44" />
+    <Setter Property="Height" Value="44" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="22" />
+    <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextMutedBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="^.active">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.AccentBrush}" />
+    </Style>
+    <Style Selector="^.active /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.AccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -26,6 +26,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="LibVLCSharp" Version="3.10.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.15" />
+    <PackageReference Include="QRCoder" Version="1.8.1" />
     <PackageReference Include="SkiaSharp.Skottie" Version="3.119.4" />
     <PackageReference Include="tdlib.native" Version="1.8.69" />
     <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.2" />

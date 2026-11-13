@@ -7,6 +7,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:chrome="using:Avalonia.Controls.Chrome"
              xmlns:l="using:MeowGram.Localization"
+             xmlns:controls="using:MeowGram.Controls"
              x:Class="MeowGram.Controls.TitleBar"
              Height="{DynamicResource Mg.TitleBarHeight}">
 
@@ -38,20 +39,17 @@
     <Style Selector="Button.chrome.close:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource Mg.ChromeCloseHoverBrush}" />
     </Style>
-    <Style Selector="Button.chrome Path">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-      <Setter Property="Stretch" Value="Uniform" />
-      <Setter Property="StrokeThickness" Value="1.6" />
-      <Setter Property="StrokeLineCap" Value="Round" />
-      <Setter Property="StrokeJoin" Value="Round" />
-      <Setter Property="Stroke" Value="{DynamicResource Mg.TextMutedBrush}" />
+    <Style Selector="Button.chrome controls|StrokeIcon">
+      <Setter Property="Width" Value="14" />
+      <Setter Property="Height" Value="14" />
+      <Setter Property="StrokeThickness" Value="1.8" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextMutedBrush}" />
     </Style>
-    <Style Selector="Button.chrome:pointerover Path">
-      <Setter Property="Stroke" Value="{DynamicResource Mg.TextBrush}" />
+    <Style Selector="Button.chrome:pointerover controls|StrokeIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
     </Style>
-    <Style Selector="Button.chrome.close:pointerover Path">
-      <Setter Property="Stroke" Value="#FFFFFF" />
+    <Style Selector="Button.chrome.close:pointerover controls|StrokeIcon">
+      <Setter Property="Foreground" Value="#FFFFFF" />
     </Style>
   </UserControl.Styles>
 
@@ -66,18 +64,18 @@
               chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
               ToolTip.Tip="{l:Tr Window_Minimize}"
               AutomationProperties.Name="{l:Tr Window_Minimize}">
-        <Path Data="{StaticResource Icon.Minus}" />
+        <controls:StrokeIcon Data="{StaticResource Icon.Minus}" />
       </Button>
       <Button x:Name="MaximizeButton" Classes="chrome"
               chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
               AutomationProperties.Name="{l:Tr Window_Maximize}">
-        <Path x:Name="MaximizeIcon" Data="{StaticResource Icon.Square}" />
+        <controls:StrokeIcon x:Name="MaximizeIcon" Data="{StaticResource Icon.Square}" />
       </Button>
       <Button x:Name="CloseButton" Classes="chrome close"
               chrome:WindowDecorationProperties.ElementRole="CloseButton"
               ToolTip.Tip="{l:Tr Window_Close}"
               AutomationProperties.Name="{l:Tr Window_Close}">
-        <Path Data="{StaticResource Icon.X}" />
+        <controls:StrokeIcon Data="{StaticResource Icon.X}" />
       </Button>
     </StackPanel>
   </Grid>

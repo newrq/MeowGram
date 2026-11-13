@@ -1,0 +1,185 @@
+<!--
+  Поля ввода MeowGram.
+  MeowTextBox: «утоплено» в карточку, фокус — акцентная граница, ошибка — красная.
+  TextPresenter прозрачный (ввод, выделение, IME), символы и каретку рисует GlyphLayer поверх.
+  CodeInput: ячейки кода, цифры рисует CodeCellsLayer.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:MeowGram.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:MeowTextBox}" TargetType="controls:MeowTextBox">
+    <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="PlaceholderForeground" Value="{DynamicResource Mg.TextMutedBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Mg.AccentBrush}" />
+    <Setter Property="SelectionForegroundBrush" Value="Transparent" />
+    <Setter Property="CaretBrush" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Mg.InputRadius}" />
+    <Setter Property="FontSize" Value="{DynamicResource Mg.FontInput}" />
+    <Setter Property="Height" Value="52" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_BorderElement"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+            </Transitions>
+          </Border.Transitions>
+          <Grid ColumnDefinitions="*,Auto" Margin="{TemplateBinding Padding}">
+            <ScrollViewer Name="PART_ScrollViewer"
+                          HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                          VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                          VerticalAlignment="Center">
+              <Panel>
+                <TextBlock Name="PART_Placeholder"
+                           Foreground="{TemplateBinding PlaceholderForeground}"
+                           Text="{TemplateBinding PlaceholderText}"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False"
+                           IsVisible="{Binding $parent[TextBox].Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+                <TextPresenter Name="PART_TextPresenter"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                               CaretIndex="{TemplateBinding CaretIndex}"
+                               SelectionStart="{TemplateBinding SelectionStart}"
+                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                               TextAlignment="{TemplateBinding TextAlignment}"
+                               TextWrapping="NoWrap"
+                               LetterSpacing="{TemplateBinding LetterSpacing}"
+                               PasswordChar="{TemplateBinding PasswordChar}"
+                               RevealPassword="{TemplateBinding RevealPassword}"
+                               SelectionBrush="{TemplateBinding SelectionBrush}"
+                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                               CaretBrush="{TemplateBinding CaretBrush}"
+                               Foreground="Transparent"
+                               VerticalAlignment="Center" />
+                <controls:GlyphLayer Name="PART_GlyphLayer" />
+              </Panel>
+              <ScrollViewer.Styles>
+                <Style Selector="ScrollContentPresenter#PART_ContentPresenter">
+                  <Setter Property="Cursor" Value="IBeam" />
+                </Style>
+              </ScrollViewer.Styles>
+            </ScrollViewer>
+
+            <!-- «Глазик» — только у приватного поля: перечёркнутый глаз ↔ открытый, с поворотом и масштабом. -->
+            <ToggleButton Name="PART_RevealButton"
+                          Grid.Column="1"
+                          Margin="8,0,-6,0"
+                          Width="36" Height="36"
+                          Padding="0"
+                          Cursor="Hand"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          CornerRadius="10"
+                          Focusable="False"
+                          IsVisible="{TemplateBinding IsPrivate}"
+                          IsChecked="{Binding $parent[TextBox].RevealPassword, Mode=TwoWay}">
+              <ToggleButton.Template>
+                <ControlTemplate>
+                  <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+                    <Panel>
+                      <controls:StrokeIcon Name="EyeClosed" Data="{StaticResource Icon.EyeOff}"
+                                           Foreground="{DynamicResource Mg.TextMutedBrush}"
+                                           RenderTransform="scale(1) rotate(0deg)">
+                        <controls:StrokeIcon.Transitions>
+                          <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="BackEaseOut" />
+                          </Transitions>
+                        </controls:StrokeIcon.Transitions>
+                      </controls:StrokeIcon>
+                      <controls:StrokeIcon Name="EyeOpen" Data="{StaticResource Icon.Eye}"
+                                           Foreground="{DynamicResource Mg.TextBrush}"
+                                           Opacity="0"
+                                           RenderTransform="scale(0.6) rotate(-20deg)">
+                        <controls:StrokeIcon.Transitions>
+                          <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="BackEaseOut" />
+                          </Transitions>
+                        </controls:StrokeIcon.Transitions>
+                      </controls:StrokeIcon>
+                    </Panel>
+                  </Border>
+                </ControlTemplate>
+              </ToggleButton.Template>
+              <ToggleButton.Styles>
+                <Style Selector="ToggleButton:pointerover">
+                  <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+                </Style>
+                <Style Selector="ToggleButton:checked /template/ controls|StrokeIcon#EyeClosed">
+                  <Setter Property="Opacity" Value="0" />
+                  <Setter Property="RenderTransform" Value="scale(0.6) rotate(20deg)" />
+                </Style>
+                <Style Selector="ToggleButton:checked /template/ controls|StrokeIcon#EyeOpen">
+                  <Setter Property="Opacity" Value="1" />
+                  <Setter Property="RenderTransform" Value="scale(1) rotate(0deg)" />
+                </Style>
+              </ToggleButton.Styles>
+            </ToggleButton>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="^:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.AccentBrush}" />
+    </Style>
+    <Style Selector="^:error /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.ErrorBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.6" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Ячейки кода: настоящий TextBox (невидимый) принимает ввод, CodeCellsLayer рисует ячейки и цифры. -->
+  <ControlTheme x:Key="{x:Type controls:CodeInput}" TargetType="controls:CodeInput">
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Mg.AccentBrush}" />
+    <Setter Property="CaretBrush" Value="Transparent" />
+    <Setter Property="SelectionBrush" Value="Transparent" />
+    <Setter Property="SelectionForegroundBrush" Value="Transparent" />
+    <Setter Property="FontFamily" Value="{DynamicResource Mg.DisplayFont}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="FontSize" Value="30" />
+    <Setter Property="Height" Value="60" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <TextPresenter Name="PART_TextPresenter"
+                         Text="{TemplateBinding Text, Mode=TwoWay}"
+                         CaretIndex="{TemplateBinding CaretIndex}"
+                         SelectionStart="{TemplateBinding SelectionStart}"
+                         SelectionEnd="{TemplateBinding SelectionEnd}"
+                         CaretBrush="Transparent"
+                         SelectionBrush="Transparent"
+                         SelectionForegroundBrush="Transparent"
+                         Foreground="Transparent"
+                         Opacity="0" />
+          <controls:CodeCellsLayer Name="PART_Cells" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>
