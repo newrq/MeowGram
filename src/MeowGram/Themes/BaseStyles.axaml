@@ -24,7 +24,7 @@
   </Style>
   <Style Selector="TextBlock.body">
     <Setter Property="FontSize" Value="{DynamicResource Mg.FontBody}" />
-    <Setter Property="LineHeight" Value="22" />
+    <Setter Property="LineHeight" Value="23" />
     <Setter Property="TextWrapping" Value="Wrap" />
   </Style>
   <Style Selector="TextBlock.secondary">
@@ -32,7 +32,7 @@
   </Style>
   <Style Selector="TextBlock.caption">
     <Setter Property="FontSize" Value="{DynamicResource Mg.FontCaption}" />
-    <Setter Property="LineHeight" Value="18" />
+    <Setter Property="LineHeight" Value="19" />
   </Style>
 
   <!-- Карточка (1) и панель (2) экрана входа. -->

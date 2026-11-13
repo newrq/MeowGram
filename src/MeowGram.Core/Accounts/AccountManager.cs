@@ -35,6 +35,10 @@ public sealed class AccountManager : IAsyncDisposable
     private readonly ConcurrentDictionary<string, byte> _closingIntentionally = new();
     private volatile IReadOnlyList<AccountInfo> _accounts = [];
 
+    // Id входа в процессе — ставится ДО запуска TDLib: первые состояния новой сессии приходят сразу,
+    // и без метки «просит номер» выглядело бы как отозванная авторизация.
+    private volatile string? _pendingAccountId;
+
     public AccountManager(
         IDbContextFactory<AppDbContext> dbFactory,
         AppPaths paths,
@@ -134,6 +138,7 @@ public sealed class AccountManager : IAsyncDisposable
                 await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
+            _pendingAccountId = id;
             PendingSession = await StartSessionAsync(id, cancellationToken).ConfigureAwait(false);
             return PendingSession;
         }
@@ -153,6 +158,7 @@ public sealed class AccountManager : IAsyncDisposable
                 return;
 
             PendingSession = null;
+            _pendingAccountId = null;
             await RemoveSessionAsync(pending, logOut: false).ConfigureAwait(false);
         }
         finally
@@ -220,7 +226,7 @@ public sealed class AccountManager : IAsyncDisposable
         if (sender is not TelegramSession session)
             return;
 
-        var isPending = ReferenceEquals(session, PendingSession);
+        var isPending = session.AccountId == _pendingAccountId;
 
         switch (state)
         {
@@ -244,10 +250,11 @@ public sealed class AccountManager : IAsyncDisposable
         await _mutex.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (!ReferenceEquals(session, PendingSession))
+            if (session.AccountId != _pendingAccountId)
                 return;
 
             PendingSession = null;
+            _pendingAccountId = null;
 
             var duplicate = _accounts.FirstOrDefault(a => a.UserId == me.Id);
             if (duplicate is not null)

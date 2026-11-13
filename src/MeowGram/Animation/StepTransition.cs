@@ -41,17 +41,22 @@ public sealed class StepTransition : IPageTransition
         }
         finally
         {
-            if (from is not null)
+            // Переход отменили (новый шаг пришёл раньше, чем этот доиграл): презентеры уже отданы новому
+            // переходу — один из них показывает новый шаг. Трогать их нельзя, иначе карточка опустеет.
+            if (!cancellationToken.IsCancellationRequested)
             {
-                from.IsVisible = false;
-                from.Opacity = 1;
-                from.RenderTransform = null;
-            }
+                if (from is not null)
+                {
+                    from.IsVisible = false;
+                    from.Opacity = 1;
+                    from.RenderTransform = null;
+                }
 
-            if (to is not null)
-            {
-                to.Opacity = 1;
-                to.RenderTransform = null;
+                if (to is not null)
+                {
+                    to.Opacity = 1;
+                    to.RenderTransform = null;
+                }
             }
 
             foreach (var riser in risers)
@@ -136,7 +141,7 @@ public static class UiAnimation
         {
             if (ct.IsCancellationRequested)
             {
-                apply(1);
+                // Без финального кадра: элементы уже принадлежат следующей анимации.
                 done.TrySetResult();
                 return;
             }
