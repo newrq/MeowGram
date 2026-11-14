@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using MeowGram.Core;
+using MeowGram.Core.Messaging;
 using MeowGram.Core.Settings;
 using MeowGram.Core.Telegram;
 using MeowGram.Localization;
@@ -74,6 +75,8 @@ public partial class App : Application
             .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
             .AddEnvironmentVariables(prefix: "MEOWGRAM_");
 
+        // До ядра: оно регистрирует поток состояния чатов, только если его не задали.
+        builder.Services.AddSingleton<IMainThread, AvaloniaMainThread>();
         builder.Services.AddMeowGramCore();
         builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
         builder.Services.AddSingleton<ThemeService>();

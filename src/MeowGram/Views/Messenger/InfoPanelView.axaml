@@ -1,0 +1,200 @@
+<!--
+  Инфо-панель активного окна (макеты Main / Group): профиль собеседника или «О группе».
+  Аватар 96, имя Playfair 22, статус; три быстрых действия; поля; участники (группа) или уведомления (личный);
+  вкладки «Медиа / Файлы / Ссылки».
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MeowGram.ViewModels.Messenger"
+             xmlns:controls="using:MeowGram.Controls"
+             xmlns:l="using:MeowGram.Localization"
+             x:Class="MeowGram.Views.Messenger.InfoPanelView"
+             x:DataType="vm:InfoPanelViewModel"
+             x:CompileBindings="True">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.fieldValue">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="LineHeight" Value="21" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.fieldLabel">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Background="{DynamicResource Mg.SurfaceBrush}" CornerRadius="28">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="18,16,18,20" Spacing="18">
+        <!-- Заголовок -->
+        <DockPanel>
+          <Button x:Name="CloseButton" DockPanel.Dock="Right" Theme="{StaticResource Mg.IconButton}" Width="36" Height="36"
+                  ToolTip.Tip="{l:Tr Tip_Close}" AutomationProperties.Name="{l:Tr Tip_Close}">
+            <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="18" Height="18" />
+          </Button>
+          <TextBlock Text="{Binding PanelTitle}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <!-- Аватар, имя, статус -->
+        <StackPanel HorizontalAlignment="Center" Spacing="6">
+          <Panel Width="96" Height="96" Margin="0,0,0,6" HorizontalAlignment="Center">
+            <controls:Avatar Size="96" Initials="{Binding Row.Initials}" Image="{Binding Row.Photo}"
+                             Background="{Binding Row.AvatarBackground}" IsVisible="{Binding !Row.IsSaved}" />
+            <Border CornerRadius="48" Background="{DynamicResource Mg.AccentBrush}" IsVisible="{Binding Row.IsSaved}">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/bookmark.svg" Width="40" Height="40"
+                                Foreground="{DynamicResource Mg.OnAccentBrush}" />
+            </Border>
+          </Panel>
+          <TextBlock Text="{Binding Row.Title}" FontFamily="{DynamicResource Mg.DisplayFont}" FontSize="22" FontWeight="SemiBold"
+                     HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Row.Subtitle}" FontSize="13" HorizontalAlignment="Center"
+                     Foreground="{DynamicResource Mg.MetaBrush}" IsVisible="{Binding IsPrivate}"
+                     Classes.online="{Binding Row.ShowOnline}">
+            <TextBlock.Styles>
+              <Style Selector="TextBlock.online">
+                <Setter Property="Foreground" Value="{DynamicResource Mg.OnlineBrush}" />
+              </Style>
+            </TextBlock.Styles>
+          </TextBlock>
+          <TextBlock Text="{Binding GroupSubtitle}" FontSize="13" HorizontalAlignment="Center"
+                     Foreground="{DynamicResource Mg.TextSecondaryBrush}" IsVisible="{Binding IsGroup}" />
+        </StackPanel>
+
+        <!-- Быстрые действия -->
+        <UniformGrid Columns="3" ColumnSpacing="8">
+          <Button Theme="{StaticResource Mg.QuickAction}" IsVisible="{Binding IsPrivate}" ToolTip.Tip="{l:Tr Common_Soon}">
+            <StackPanel Spacing="5">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-call.svg" Width="19" Height="19" HorizontalAlignment="Center" />
+              <TextBlock Text="{l:Tr Info_Call}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Theme="{StaticResource Mg.QuickAction}" Command="{Binding ToggleMuteCommand}">
+            <StackPanel Spacing="5">
+              <Panel Width="19" Height="19" HorizontalAlignment="Center">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/bell.svg" Width="19" Height="19" IsVisible="{Binding !IsMuted}" />
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/muted.svg" Width="19" Height="19" IsVisible="{Binding IsMuted}" />
+              </Panel>
+              <TextBlock Text="{Binding MuteLabel}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Theme="{StaticResource Mg.QuickAction}" Command="{Binding SearchCommand}">
+            <StackPanel Spacing="5">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-search.svg" Width="19" Height="19" HorizontalAlignment="Center" />
+              <TextBlock Text="{l:Tr Info_Search}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Theme="{StaticResource Mg.QuickAction}" IsVisible="{Binding IsGroup}" Command="{Binding CopyLinkCommand}"
+                  IsEnabled="{Binding InviteLink, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <StackPanel Spacing="5">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/link.svg" Width="19" Height="19" HorizontalAlignment="Center" />
+              <TextBlock Text="{l:Tr Info_Link}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </UniformGrid>
+
+        <!-- Личный чат: имя пользователя, о себе, уведомления -->
+        <StackPanel Spacing="2" IsVisible="{Binding IsPrivate}">
+          <StackPanel Margin="4,10" IsVisible="{Binding HasUsername}">
+            <TextBlock Classes="fieldValue" Text="{Binding Username}" />
+            <TextBlock Classes="fieldLabel" Text="{l:Tr Info_Username}" />
+          </StackPanel>
+          <StackPanel Margin="4,10" IsVisible="{Binding HasBio}">
+            <TextBlock Classes="fieldValue" Text="{Binding Bio}" />
+            <TextBlock Classes="fieldLabel" Text="{l:Tr Info_Bio}" />
+          </StackPanel>
+          <DockPanel Margin="4,10">
+            <controls:SlideSwitch DockPanel.Dock="Right" Theme="{StaticResource Mg.Toggle}" IsChecked="{Binding NotificationsOn, Mode=TwoWay}"
+                                  AutomationProperties.Name="{l:Tr Info_Notifications}" />
+            <TextBlock Text="{l:Tr Info_Notifications}" FontSize="15" VerticalAlignment="Center" />
+          </DockPanel>
+        </StackPanel>
+
+        <!-- Группа: описание и участники -->
+        <StackPanel Spacing="16" IsVisible="{Binding IsGroup}">
+          <StackPanel IsVisible="{Binding HasDescription}" Spacing="4">
+            <TextBlock Classes="fieldLabel" Text="{l:Tr Info_Description}" />
+            <TextBlock Classes="fieldValue" Margin="4,0,4,0" Text="{Binding Description}" />
+          </StackPanel>
+          <StackPanel IsVisible="{Binding HasMembers}">
+            <DockPanel Margin="4,6,4,0">
+              <Button DockPanel.Dock="Right" Theme="{StaticResource Mg.FilledIconButton}" Classes="inset" Width="32" Height="32"
+                      CornerRadius="10" ToolTip.Tip="{l:Tr Common_Soon}" AutomationProperties.Name="{l:Tr Info_AddMember}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/plus.svg" Width="16" Height="16" />
+              </Button>
+              <TextBlock Text="{Binding MembersHeader}" FontSize="13" FontWeight="SemiBold"
+                         Foreground="{DynamicResource Mg.TextSecondaryBrush}" VerticalAlignment="Center" />
+            </DockPanel>
+            <ItemsControl ItemsSource="{Binding Members}" Margin="0,4,0,0">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:MemberViewModel">
+                  <Button Theme="{StaticResource Mg.ChatRow}" Padding="6,8" CornerRadius="14" Margin="0,0,0,2" Cursor="Arrow">
+                    <DockPanel>
+                      <controls:Avatar DockPanel.Dock="Left" Size="40" Margin="0,0,12,0" Initials="{Binding Avatar.Initials}"
+                                       Image="{Binding Avatar.Photo}" Background="{Binding Avatar.Background}" />
+                      <TextBlock DockPanel.Dock="Right" Text="{Binding Role}" FontSize="12.5" VerticalAlignment="Center"
+                                 Foreground="{DynamicResource Mg.TextSecondaryBrush}" IsVisible="{Binding HasRole}" />
+                      <StackPanel VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="{Binding Name}" FontSize="14.5" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Status}" FontSize="12.5" Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                                   Classes.online="{Binding IsOnline}">
+                          <TextBlock.Styles>
+                            <Style Selector="TextBlock.online">
+                              <Setter Property="Foreground" Value="{DynamicResource Mg.OnlineBrush}" />
+                            </Style>
+                          </TextBlock.Styles>
+                        </TextBlock>
+                      </StackPanel>
+                    </DockPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Вложения -->
+        <Border Background="{DynamicResource Mg.InsetBrush}" CornerRadius="14" Padding="4">
+          <UniformGrid Columns="3" ColumnSpacing="2">
+            <Button x:Name="TabMedia" Theme="{StaticResource Mg.SegmentTab}" Content="{l:Tr Info_TabMedia}"
+                    Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:AttachmentTab.Media}" />
+            <Button x:Name="TabFiles" Theme="{StaticResource Mg.SegmentTab}" Content="{l:Tr Info_TabFiles}"
+                    Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:AttachmentTab.Files}" />
+            <Button x:Name="TabLinks" Theme="{StaticResource Mg.SegmentTab}" Content="{l:Tr Info_TabLinks}"
+                    Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:AttachmentTab.Links}" />
+          </UniformGrid>
+        </Border>
+
+        <Panel>
+          <ItemsControl ItemsSource="{Binding Attachments}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:AttachmentViewModel">
+                <Button Theme="{StaticResource Mg.ChatRow}" Padding="4,8" CornerRadius="14" Margin="0,0,0,4"
+                        Command="{Binding OpenCommand}" AutomationProperties.Name="{Binding Title}">
+                  <DockPanel>
+                    <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="12" Margin="0,0,12,0" ClipToBounds="True"
+                            Background="{DynamicResource Mg.InsetBrush}">
+                      <Panel>
+                        <TextBlock Text="{Binding Badge}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" Foreground="{DynamicResource Mg.TextSecondaryBrush}" />
+                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                      </Panel>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                      <TextBlock Text="{Binding Title}" FontSize="14.5" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Subtitle}" FontSize="12.5" Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                                 TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </DockPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="{l:Tr Info_NoAttachments}" Classes="caption secondary" HorizontalAlignment="Center" Margin="0,8"
+                     IsVisible="{Binding HasNoAttachments}" />
+        </Panel>
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
+</UserControl>

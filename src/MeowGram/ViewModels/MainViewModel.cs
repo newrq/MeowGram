@@ -1,12 +1,15 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MeowGram.Core.Accounts;
+using MeowGram.Core.Messaging;
+using MeowGram.Core.Settings;
+using MeowGram.ViewModels.Messenger;
 using MeowGram.ViewModels.Login;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MeowGram.ViewModels;
 
-/// <summary>Главное окно: экран входа, пока нет вошедшего аккаунта, иначе — домашний экран.</summary>
+/// <summary>Главное окно: экран входа, пока нет вошедшего аккаунта, иначе — мессенджер.</summary>
 public partial class MainViewModel : ViewModelBase
 {
     private readonly AccountManager? _accounts;
@@ -48,10 +51,14 @@ public partial class MainViewModel : ViewModelBase
 
     private void ShowHome()
     {
-        if (_accounts is null)
+        if (_accounts is null || _services is null)
             return;
 
-        SetCurrent(new HomeViewModel(_accounts, this));
+        SetCurrent(new MessengerViewModel(
+            _services.GetRequiredService<MessagingHub>(),
+            _accounts,
+            _services.GetRequiredService<ISettingsStore>(),
+            this));
     }
 
     private void OnActiveSessionChanged()
@@ -60,10 +67,9 @@ public partial class MainViewModel : ViewModelBase
             return;
 
         var signedIn = _accounts.PendingSession is null && _accounts.ActiveSession is not null;
-        if (signedIn && Current is not HomeViewModel)
+        // Смену активного аккаунта внутри главного окна MessengerViewModel обрабатывает сам.
+        if (signedIn && Current is not MessengerViewModel)
             ShowHome();
-        else if (signedIn && Current is HomeViewModel home)
-            home.Refresh();
         else if (_accounts.ActiveSession is null && Current is not LoginViewModel)
             ShowLogin();
     }

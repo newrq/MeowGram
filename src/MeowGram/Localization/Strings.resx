@@ -107,8 +107,182 @@
   <data name="Accent_violet" xml:space="preserve"><value>Фиолетовый</value></data>
   <data name="Accent_violetGradient" xml:space="preserve"><value>Фиолетовый градиент</value></data>
   <data name="Accounts_Hint" xml:space="preserve"><value>Аккаунты, в которые вы уже вошли. Нажмите, чтобы вернуться</value></data>
-  <data name="Home_Title" xml:space="preserve"><value>Вы вошли</value></data>
-  <data name="Home_Subtitle" xml:space="preserve"><value>Здесь скоро будут чаты</value></data>
-  <data name="Home_LogOut" xml:space="preserve"><value>Выйти из аккаунта</value></data>
-  <data name="Home_AddAccount" xml:space="preserve"><value>Добавить аккаунт</value></data>
+  <data name="Time_Yesterday" xml:space="preserve"><value>Вчера</value></data>
+  <data name="Time_Today" xml:space="preserve"><value>Сегодня</value></data>
+  <data name="Time_ShortDateFormat" xml:space="preserve"><value>d MMM</value></data>
+  <data name="Time_DayMonthFormat" xml:space="preserve"><value>d MMMM</value></data>
+  <data name="Time_DayMonthYearFormat" xml:space="preserve"><value>d MMMM yyyy</value></data>
+  <data name="Status_Bot" xml:space="preserve"><value>бот</value></data>
+  <data name="Status_Support" xml:space="preserve"><value>поддержка Telegram</value></data>
+  <data name="Status_Online" xml:space="preserve"><value>в сети</value></data>
+  <data name="Status_Recently" xml:space="preserve"><value>был(а) недавно</value></data>
+  <data name="Status_LastWeek" xml:space="preserve"><value>был(а) на этой неделе</value></data>
+  <data name="Status_LastMonth" xml:space="preserve"><value>был(а) в этом месяце</value></data>
+  <data name="Status_LongAgo" xml:space="preserve"><value>был(а) давно</value></data>
+  <data name="Status_JustNow" xml:space="preserve"><value>был(а) только что</value></data>
+  <data name="Status_LastSeenAt" xml:space="preserve"><value>был(а) в {0}</value></data>
+  <data name="Status_LastSeenYesterday" xml:space="preserve"><value>был(а) вчера в {0}</value></data>
+  <data name="Status_LastSeenDate" xml:space="preserve"><value>был(а) {0}</value></data>
+  <data name="Status_Sending" xml:space="preserve"><value>Отправляется</value></data>
+  <data name="Status_Sent" xml:space="preserve"><value>Отправлено</value></data>
+  <data name="Status_Read" xml:space="preserve"><value>Прочитано</value></data>
+  <data name="Plural_Subscriber" xml:space="preserve"><value>{0} подписчик|{0} подписчика|{0} подписчиков</value></data>
+  <data name="Plural_Member" xml:space="preserve"><value>{0} участник|{0} участника|{0} участников</value></data>
+  <data name="Plural_Person" xml:space="preserve"><value>{0} человек|{0} человека|{0} человек</value></data>
+  <data name="Chat_Channel" xml:space="preserve"><value>канал</value></data>
+  <data name="Chat_Group" xml:space="preserve"><value>группа</value></data>
+  <data name="Chat_GroupLower" xml:space="preserve"><value>группа</value></data>
+  <data name="Chat_ChannelLower" xml:space="preserve"><value>канал</value></data>
+  <data name="Chat_MembersOnline" xml:space="preserve"><value>{0}, {1} в сети</value></data>
+  <data name="Chat_Unknown" xml:space="preserve"><value>Неизвестный</value></data>
+  <data name="Chat_DeletedAccount" xml:space="preserve"><value>Удалённый аккаунт</value></data>
+  <data name="Chat_Saved" xml:space="preserve"><value>Избранное</value></data>
+  <data name="Chat_DraftPrefix" xml:space="preserve"><value>Черновик:</value></data>
+  <data name="Chat_YouPrefix" xml:space="preserve"><value>Вы:</value></data>
+  <data name="Chat_Loading" xml:space="preserve"><value>Загрузка…</value></data>
+  <data name="Chats_Empty" xml:space="preserve"><value>Здесь пока пусто</value></data>
+  <data name="Size_B" xml:space="preserve"><value>Б</value></data>
+  <data name="Size_KB" xml:space="preserve"><value>КБ</value></data>
+  <data name="Size_MB" xml:space="preserve"><value>МБ</value></data>
+  <data name="Size_GB" xml:space="preserve"><value>ГБ</value></data>
+  <data name="Content_Photo" xml:space="preserve"><value>Фото</value></data>
+  <data name="Content_Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Content_Gif" xml:space="preserve"><value>GIF</value></data>
+  <data name="Content_Voice" xml:space="preserve"><value>Голосовое сообщение · {0}</value></data>
+  <data name="Content_VideoNote" xml:space="preserve"><value>Видеосообщение</value></data>
+  <data name="Content_File" xml:space="preserve"><value>Файл</value></data>
+  <data name="Content_Audio" xml:space="preserve"><value>Аудио</value></data>
+  <data name="Content_Sticker" xml:space="preserve"><value>{0} Стикер</value></data>
+  <data name="Content_Poll" xml:space="preserve"><value>Опрос: {0}</value></data>
+  <data name="Content_Contact" xml:space="preserve"><value>Контакт</value></data>
+  <data name="Content_Location" xml:space="preserve"><value>Геопозиция</value></data>
+  <data name="Content_Call" xml:space="preserve"><value>Звонок</value></data>
+  <data name="Content_Unsupported" xml:space="preserve"><value>Сообщение не поддерживается</value></data>
+  <data name="Content_Message" xml:space="preserve"><value>Сообщение</value></data>
+  <data name="Service_You" xml:space="preserve"><value>Вы</value></data>
+  <data name="Service_Joined" xml:space="preserve"><value>{0} присоединился(-лась) к группе</value></data>
+  <data name="Service_Added" xml:space="preserve"><value>{0} добавил(а) {1}</value></data>
+  <data name="Service_Left" xml:space="preserve"><value>{0} покинул(а) группу</value></data>
+  <data name="Service_Removed" xml:space="preserve"><value>{0} удалил(а) {1}</value></data>
+  <data name="Service_Title" xml:space="preserve"><value>{0} изменил(а) название на «{1}»</value></data>
+  <data name="Service_Photo" xml:space="preserve"><value>{0} изменил(а) фото</value></data>
+  <data name="Service_PhotoRemoved" xml:space="preserve"><value>{0} удалил(а) фото</value></data>
+  <data name="Service_Pinned" xml:space="preserve"><value>{0} закрепил(а) сообщение</value></data>
+  <data name="Service_Created" xml:space="preserve"><value>{0} создал(а) группу «{1}»</value></data>
+  <data name="Service_Registered" xml:space="preserve"><value>{0} теперь в Telegram</value></data>
+  <data name="Service_Screenshot" xml:space="preserve"><value>{0} сделал(а) снимок экрана</value></data>
+  <data name="Service_VideoChatStarted" xml:space="preserve"><value>Видеочат начался</value></data>
+  <data name="Service_VideoChatEnded" xml:space="preserve"><value>Видеочат завершён</value></data>
+  <data name="Service_Other" xml:space="preserve"><value>Служебное сообщение</value></data>
+  <data name="Typing_Voice" xml:space="preserve"><value>записывает голосовое</value></data>
+  <data name="Typing_Photo" xml:space="preserve"><value>отправляет фото</value></data>
+  <data name="Typing_File" xml:space="preserve"><value>отправляет файл</value></data>
+  <data name="Typing_Sticker" xml:space="preserve"><value>выбирает стикер</value></data>
+  <data name="Typing_Video" xml:space="preserve"><value>записывает видео</value></data>
+  <data name="Typing_Text" xml:space="preserve"><value>печатает</value></data>
+  <data name="Typing_Many" xml:space="preserve"><value>{0} печатают…</value></data>
+  <data name="Folder_All" xml:space="preserve"><value>Все</value></data>
+  <data name="Folder_Personal" xml:space="preserve"><value>Личные</value></data>
+  <data name="Folder_Groups" xml:space="preserve"><value>Группы</value></data>
+  <data name="Folder_Channels" xml:space="preserve"><value>Каналы</value></data>
+  <data name="Folder_Bots" xml:space="preserve"><value>Боты</value></data>
+  <data name="Folder_Archive" xml:space="preserve"><value>Архив</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Поиск</value></data>
+  <data name="Search_Contacts" xml:space="preserve"><value>Контакты</value></data>
+  <data name="Search_ChatsAndContacts" xml:space="preserve"><value>Чаты и контакты</value></data>
+  <data name="Search_Global" xml:space="preserve"><value>Глобальный поиск</value></data>
+  <data name="Search_MessagesCount" xml:space="preserve"><value>Сообщения · {0}</value></data>
+  <data name="Search_Nothing" xml:space="preserve"><value>Ничего не найдено</value></data>
+  <data name="Search_NothingInChat" xml:space="preserve"><value>Не найдено</value></data>
+  <data name="Search_InChatPosition" xml:space="preserve"><value>{0} из {1}</value></data>
+  <data name="Search_InChatPlaceholder" xml:space="preserve"><value>Поиск в чате</value></data>
+  <data name="Search_TabAll" xml:space="preserve"><value>Все</value></data>
+  <data name="Search_TabChats" xml:space="preserve"><value>Чаты</value></data>
+  <data name="Search_TabMedia" xml:space="preserve"><value>Медиа</value></data>
+  <data name="Search_TabLinks" xml:space="preserve"><value>Ссылки</value></data>
+  <data name="Search_TabFiles" xml:space="preserve"><value>Файлы</value></data>
+  <data name="Message_Edited" xml:space="preserve"><value>изменено {0}</value></data>
+  <data name="Message_ReplyUnknown" xml:space="preserve"><value>Сообщение</value></data>
+  <data name="Message_You" xml:space="preserve"><value>Вы</value></data>
+  <data name="Message_ForwardedFrom" xml:space="preserve"><value>Переслано от</value></data>
+  <data name="Composer_Placeholder" xml:space="preserve"><value>Сообщение</value></data>
+  <data name="Composer_Editing" xml:space="preserve"><value>Редактирование</value></data>
+  <data name="Composer_ReplyTo" xml:space="preserve"><value>Ответ {0}</value></data>
+  <data name="Pinned_Title" xml:space="preserve"><value>Закреплённое сообщение</value></data>
+  <data name="Unread_Separator" xml:space="preserve"><value>Непрочитанные сообщения</value></data>
+  <data name="Voice_Unlistened" xml:space="preserve"><value>Не прослушано</value></data>
+  <data name="Menu_Reply" xml:space="preserve"><value>Ответить</value></data>
+  <data name="Menu_Copy" xml:space="preserve"><value>Копировать</value></data>
+  <data name="Menu_Forward" xml:space="preserve"><value>Переслать</value></data>
+  <data name="Menu_Edit" xml:space="preserve"><value>Изменить</value></data>
+  <data name="Menu_Pin" xml:space="preserve"><value>Закрепить</value></data>
+  <data name="Menu_Unpin" xml:space="preserve"><value>Открепить</value></data>
+  <data name="Menu_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Info_Owner" xml:space="preserve"><value>владелец</value></data>
+  <data name="Info_Admin" xml:space="preserve"><value>админ</value></data>
+  <data name="Info_AboutGroup" xml:space="preserve"><value>О группе</value></data>
+  <data name="Info_AboutChannel" xml:space="preserve"><value>О канале</value></data>
+  <data name="Info_Profile" xml:space="preserve"><value>Профиль</value></data>
+  <data name="Info_MembersHeader" xml:space="preserve"><value>Участники · {0}</value></data>
+  <data name="Info_Mute" xml:space="preserve"><value>Без звука</value></data>
+  <data name="Info_Unmute" xml:space="preserve"><value>Включить звук</value></data>
+  <data name="Info_Call" xml:space="preserve"><value>Звонок</value></data>
+  <data name="Info_Search" xml:space="preserve"><value>Поиск</value></data>
+  <data name="Info_Link" xml:space="preserve"><value>Ссылка</value></data>
+  <data name="Info_Username" xml:space="preserve"><value>Имя пользователя</value></data>
+  <data name="Info_Bio" xml:space="preserve"><value>О себе</value></data>
+  <data name="Info_Notifications" xml:space="preserve"><value>Уведомления</value></data>
+  <data name="Info_Description" xml:space="preserve"><value>Описание</value></data>
+  <data name="Info_AddMember" xml:space="preserve"><value>Добавить участника</value></data>
+  <data name="Info_TabMedia" xml:space="preserve"><value>Медиа</value></data>
+  <data name="Info_TabFiles" xml:space="preserve"><value>Файлы</value></data>
+  <data name="Info_TabLinks" xml:space="preserve"><value>Ссылки</value></data>
+  <data name="Info_NoAttachments" xml:space="preserve"><value>Пока ничего нет</value></data>
+  <data name="Split_GhostSlot" xml:space="preserve"><value>Окно {0} из {1}</value></data>
+  <data name="Split_DragHint" xml:space="preserve"><value>Перетащите в центр</value></data>
+  <data name="Split_NoWindows" xml:space="preserve"><value>нет открытых окон</value></data>
+  <data name="Split_WindowsOf" xml:space="preserve"><value>{0} из {1} окон</value></data>
+  <data name="Split_AlreadyHere" xml:space="preserve"><value>Этот чат уже здесь</value></data>
+  <data name="Split_Swap" xml:space="preserve"><value>Поменять местами</value></data>
+  <data name="Split_ReplaceWith" xml:space="preserve"><value>Открыть вместо: {0}</value></data>
+  <data name="Split_ReleaseBeside" xml:space="preserve"><value>Отпустите, чтобы открыть рядом</value></data>
+  <data name="Account_Add" xml:space="preserve"><value>Добавить аккаунт</value></data>
+  <data name="Account_LogOut" xml:space="preserve"><value>Выйти из аккаунта</value></data>
+  <data name="Empty_Title" xml:space="preserve"><value>Выберите чат</value></data>
+  <data name="Empty_Text" xml:space="preserve"><value>Помяукайте друг с другом. Мяу</value></data>
+  <data name="Empty_NewMessage" xml:space="preserve"><value>Новое сообщение</value></data>
+  <data name="Hint_Search" xml:space="preserve"><value>поиск</value></data>
+  <data name="Hint_Folders" xml:space="preserve"><value>папки</value></data>
+  <data name="Hint_Windows" xml:space="preserve"><value>окна</value></data>
+  <data name="Hint_CloseChat" xml:space="preserve"><value>закрыть чат</value></data>
+  <data name="Forward_Title" xml:space="preserve"><value>Переслать</value></data>
+  <data name="Forward_Search" xml:space="preserve"><value>Поиск чата</value></data>
+  <data name="Common_Soon" xml:space="preserve"><value>Скоро</value></data>
+  <data name="Common_SoonVoice" xml:space="preserve"><value>Запись голосовых — скоро</value></data>
+  <data name="Tip_NewMessage" xml:space="preserve"><value>Новое сообщение</value></data>
+  <data name="Tip_BackToChats" xml:space="preserve"><value>Назад к чатам</value></data>
+  <data name="Tip_Clear" xml:space="preserve"><value>Очистить</value></data>
+  <data name="Tip_SearchInChat" xml:space="preserve"><value>Поиск в чате</value></data>
+  <data name="Tip_Call" xml:space="preserve"><value>Позвонить</value></data>
+  <data name="Tip_Profile" xml:space="preserve"><value>Профиль</value></data>
+  <data name="Tip_More" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Tip_CloseWindow" xml:space="preserve"><value>Закрыть окно</value></data>
+  <data name="Tip_PaneHeader" xml:space="preserve"><value>Клик — сделать окно активным, ещё клик — профиль. Перетащите, чтобы поменять окна местами</value></data>
+  <data name="Tip_SearchOlder" xml:space="preserve"><value>Раньше</value></data>
+  <data name="Tip_SearchNewer" xml:space="preserve"><value>Позже</value></data>
+  <data name="Tip_Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Tip_HidePinned" xml:space="preserve"><value>Скрыть закреп</value></data>
+  <data name="Tip_Cancel" xml:space="preserve"><value>Отменить</value></data>
+  <data name="Tip_Attach" xml:space="preserve"><value>Прикрепить</value></data>
+  <data name="Tip_Emoji" xml:space="preserve"><value>Эмодзи</value></data>
+  <data name="Tip_Record" xml:space="preserve"><value>Записать голосовое</value></data>
+  <data name="Tip_Send" xml:space="preserve"><value>Отправить</value></data>
+  <data name="Tip_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Tip_Retry" xml:space="preserve"><value>Повторить отправку</value></data>
+  <data name="Tip_PlayVoice" xml:space="preserve"><value>Воспроизвести голосовое</value></data>
+  <data name="Tip_Speed" xml:space="preserve"><value>Скорость</value></data>
+  <data name="Tip_ScrollDown" xml:space="preserve"><value>К последним сообщениям</value></data>
+  <data name="Tip_Accounts" xml:space="preserve"><value>Аккаунты</value></data>
+  <data name="Tip_Theme" xml:space="preserve"><value>Тема</value></data>
+  <data name="Tip_Settings" xml:space="preserve"><value>Настройки</value></data>
 </root>

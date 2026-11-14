@@ -1,0 +1,303 @@
+<!--
+  Оформление главного окна (макет «MeowGram — главное окно»): кнопки рейла, строки чатов, иконочные кнопки шапки,
+  вкладки поиска, пункты меню, кнопки быстрых действий инфо-панели. Размеры и цвета — из макета.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:MeowGram.Controls">
+
+  <!-- Общая основа: фон-подложка отдельным слоем (прозрачность фона не задевает содержимое), нажатие — 98%. -->
+  <ControlTheme x:Key="Mg.SurfaceButton" TargetType="Button">
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="RenderTransform" Value="scale(1)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" Easing="CubicEaseOut" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="PART_Layer"
+                  Background="{DynamicResource Mg.SurfaceBrush}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Opacity="0">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <Border x:Name="PART_Border"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.98)" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Строка списка чатов: наведение — Surface 50%, выбранная/открытая — Surface (сливается с карточкой чата). -->
+  <ControlTheme x:Key="Mg.ChatRow" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Style Selector="^:pointerover /template/ Border#PART_Layer">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="^.open /template/ Border#PART_Layer">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^.dragged">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.99)" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Папка рейла: 64 в ширину, иконка 22 и подпись 12; выбранная — карточка и основной цвет текста. -->
+  <ControlTheme x:Key="Mg.RailButton" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Width" Value="64" />
+    <Setter Property="Padding" Value="0,9,0,8" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextMutedBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Layer">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="^.selected">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^.selected /template/ Border#PART_Layer">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Иконочная кнопка шапки: 40×40, скругление 12, приглушённая иконка; .active — нажатое состояние (Line). -->
+  <ControlTheme x:Key="Mg.IconButton" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Width" Value="40" />
+    <Setter Property="Height" Value="40" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextMutedBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    </Style>
+    <Style Selector="^.active /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="^.active">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^.round">
+      <Setter Property="CornerRadius" Value="22" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Кнопка на карточке (новое сообщение у заголовка списка, закрыть окно сплита): фон inset или Surface. -->
+  <ControlTheme x:Key="Mg.FilledIconButton" TargetType="Button" BasedOn="{StaticResource Mg.IconButton}">
+    <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="^.inset">
+      <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Круглая кнопка акцента 48: отправить, сохранить, записать. -->
+  <ControlTheme x:Key="Mg.AccentCircleButton" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="24" />
+    <Setter Property="Background" Value="{DynamicResource Mg.AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.AccentHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.94)" />
+    </Style>
+    <Style Selector="^.small">
+      <Setter Property="Width" Value="40" />
+      <Setter Property="Height" Value="40" />
+      <Setter Property="CornerRadius" Value="20" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Вкладка поиска: пилюля 32; выбранная — акцент. -->
+  <ControlTheme x:Key="Mg.PillTab" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^.selected">
+      <Setter Property="Background" Value="{DynamicResource Mg.AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Сегмент вкладок вложений инфо-панели: выбранный — карточка поверх inset. -->
+  <ControlTheme x:Key="Mg.SegmentTab" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Height" Value="34" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Style Selector="^.selected">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^.selected /template/ Border#PART_Layer">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Пункт меню (сообщение, аккаунты): высота 38, скругление 12, наведение — inset; .danger — цвет ошибки. -->
+  <ControlTheme x:Key="Mg.MenuItemButton" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    </Style>
+    <Style Selector="^.danger">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.ErrorBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Быстрое действие инфо-панели: 64 в высоту, inset, иконка 19 над подписью 12. -->
+  <ControlTheme x:Key="Mg.QuickAction" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Height" Value="64" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Оболочка всплывающих меню (меню сообщения, «ещё», эмодзи): без своего фона — карточку рисует содержимое. -->
+  <ControlTheme x:Key="Mg.MenuFlyoutPresenter" TargetType="FlyoutPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0,4" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Margin="16" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Плоская кнопка без оформления (цитата, закреп, превью ссылки): только курсор и нажатие. -->
+  <ControlTheme x:Key="Mg.PlainButton" TargetType="Button" BasedOn="{StaticResource Mg.SurfaceButton}">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+  </ControlTheme>
+
+  <!-- Поле ввода без рамки: фон и скругление даёт обёртка (поиск, сообщение). -->
+  <ControlTheme x:Key="Mg.BareTextBox" TargetType="TextBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Mg.SelectionBrush}" />
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ScrollViewer Name="PART_ScrollViewer"
+                      Background="Transparent"
+                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+          <Panel Margin="{TemplateBinding Padding}">
+            <TextBlock Name="PART_Placeholder"
+                       Foreground="{DynamicResource Mg.MetaBrush}"
+                       Text="{TemplateBinding PlaceholderText}"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False"
+                       IsVisible="{Binding $parent[TextBox].Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+            <TextPresenter Name="PART_TextPresenter"
+                           Text="{TemplateBinding Text, Mode=TwoWay}"
+                           CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                           CaretIndex="{TemplateBinding CaretIndex}"
+                           SelectionStart="{TemplateBinding SelectionStart}"
+                           SelectionEnd="{TemplateBinding SelectionEnd}"
+                           TextAlignment="{TemplateBinding TextAlignment}"
+                           TextWrapping="{TemplateBinding TextWrapping}"
+                           PasswordChar="{TemplateBinding PasswordChar}"
+                           RevealPassword="{TemplateBinding RevealPassword}"
+                           SelectionBrush="{TemplateBinding SelectionBrush}"
+                           SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                           CaretBrush="{TemplateBinding CaretBrush}"
+                           VerticalAlignment="Center" />
+          </Panel>
+          <ScrollViewer.Styles>
+            <Style Selector="ScrollContentPresenter#PART_ContentPresenter">
+              <Setter Property="Cursor" Value="IBeam" />
+            </Style>
+          </ScrollViewer.Styles>
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

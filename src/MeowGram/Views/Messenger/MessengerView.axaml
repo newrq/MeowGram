@@ -1,0 +1,317 @@
+<!--
+  Главное окно (макет «MeowGram — главное окно»): рейл (аккаунт, папки), список чатов или поиск, сетка до 4 окон
+  чатов (пустой слот при перетаскивании), инфо-панель активного окна (сбоку или поверх в узком окне),
+  выбор чата для пересылки, слой перетаскивания с «желейной» карточкой.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MeowGram.ViewModels.Messenger"
+             xmlns:controls="using:MeowGram.Controls"
+             xmlns:views="using:MeowGram.Views.Messenger"
+             xmlns:l="using:MeowGram.Localization"
+             x:Class="MeowGram.Views.Messenger.MessengerView"
+             x:DataType="vm:MessengerViewModel"
+             x:CompileBindings="True">
+
+  <UserControl.Resources>
+    <!-- Карточка перетаскиваемого чата (как строка списка, на подложке с тенью) -->
+    <DataTemplate x:Key="DragCardTemplate" DataType="vm:ChatRowViewModel">
+      <Border Width="300" Padding="12,9" CornerRadius="18" Background="{DynamicResource Mg.SurfaceBrush}"
+              BorderBrush="{DynamicResource Mg.LineBrush}" BorderThickness="1" BoxShadow="0 20 44 0 #73000000">
+        <DockPanel>
+          <controls:Avatar DockPanel.Dock="Left" Size="46" Margin="0,0,12,0" Initials="{Binding Initials}" Image="{Binding Photo}"
+                           Background="{Binding AvatarBackground}" />
+          <StackPanel VerticalAlignment="Center" Spacing="3">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Right" Margin="6,0,0,0" Text="{Binding Time}" FontSize="12.5"
+                         Foreground="{DynamicResource Mg.MetaBrush}" />
+              <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+            <TextBlock Text="{Binding PreviewText}" FontSize="14" Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                       TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="Border.menuCard">
+      <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.LineBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="18" />
+      <Setter Property="Padding" Value="6" />
+      <Setter Property="BoxShadow" Value="0 16 40 0 #59000000" />
+    </Style>
+    <Style Selector="Border.keycap">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.LineBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="7,2" />
+    </Style>
+    <Style Selector="Border.keycap > TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+    </Style>
+    <Style Selector="Panel#InfoHost.overlay > Border">
+      <Setter Property="BoxShadow" Value="0 16 48 0 #66000000" />
+    </Style>
+    <!-- Пустой слот сетки -->
+    <Style Selector="Panel.ghost Rectangle.stroke">
+      <Setter Property="Stroke" Value="{DynamicResource Mg.LineBrush}" />
+    </Style>
+    <Style Selector="Panel.ghost.hot Rectangle.stroke">
+      <Setter Property="Stroke" Value="{DynamicResource Mg.AccentBrush}" />
+    </Style>
+    <Style Selector="Panel.ghost Rectangle.fill">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+    <Style Selector="Panel.ghost.hot Rectangle.fill">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Panel.ghost Rectangle.tint">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="Panel.ghost.hot Rectangle.tint">
+      <Setter Property="Opacity" Value="0.12" />
+    </Style>
+    <Style Selector="Panel.ghost controls|SvgIcon.ghostIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextMutedBrush}" />
+    </Style>
+    <Style Selector="Panel.ghost.hot controls|SvgIcon.ghostIcon">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.AccentBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Panel x:Name="Root" Background="Transparent">
+    <!-- Лапка в заголовке окна -->
+    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/paw.svg" Width="18" Height="18" Margin="22,11,0,0"
+                      HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="{DynamicResource Mg.TextMutedBrush}"
+                      IsHitTestVisible="False" />
+
+    <Grid x:Name="LayoutGrid" Margin="0,40,12,12" ColumnDefinitions="76,12,340,12,*,Auto">
+
+      <!-- ── Рейл ─────────────────────────────────────────────────────── -->
+      <DockPanel Grid.Column="0" Margin="6,4,0,4">
+        <Button x:Name="AccountButton" DockPanel.Dock="Top" Theme="{StaticResource Mg.PlainButton}" Width="44" Height="44"
+                CornerRadius="22" Margin="0,0,0,12" HorizontalAlignment="Center" Command="{Binding ToggleAccountMenuCommand}"
+                ToolTip.Tip="{Binding AccountName}" AutomationProperties.Name="{l:Tr Tip_Accounts}">
+          <controls:Avatar Size="44" Initials="{Binding AccountInitials}" Image="{Binding AccountPhoto}"
+                           Background="{DynamicResource Mg.SurfaceBrush}" Foreground="{DynamicResource Mg.TextBrush}" />
+        </Button>
+
+        <StackPanel DockPanel.Dock="Bottom" Spacing="0" HorizontalAlignment="Center">
+          <Button Theme="{StaticResource Mg.IconButton}" Classes="round" Width="44" Height="44"
+                  ToolTip.Tip="{l:Tr Common_Soon}" AutomationProperties.Name="{l:Tr Tip_Theme}">
+            <controls:SvgIcon Source="avares://MeowGram/Assets/icons/rail-theme.svg" Width="20" Height="20" />
+          </Button>
+          <Button Theme="{StaticResource Mg.IconButton}" Classes="round" Width="44" Height="44"
+                  ToolTip.Tip="{l:Tr Common_Soon}" AutomationProperties.Name="{l:Tr Tip_Settings}">
+            <controls:SvgIcon Source="avares://MeowGram/Assets/icons/rail-settings.svg" Width="20" Height="20" />
+          </Button>
+        </StackPanel>
+
+        <ItemsControl ItemsSource="{Binding ChatList.Folders, FallbackValue={x:Null}}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:FolderViewModel">
+              <Button Theme="{StaticResource Mg.RailButton}" Margin="0,0,0,4" Classes.selected="{Binding IsSelected}"
+                      Command="{Binding $parent[UserControl].((vm:MessengerViewModel)DataContext).SelectFolderCommand, FallbackValue={x:Null}}"
+                      CommandParameter="{Binding}" AutomationProperties.Name="{Binding Title}">
+                <Panel>
+                  <StackPanel Spacing="5" HorizontalAlignment="Center">
+                    <controls:SvgIcon Source="{Binding Icon}" Width="22" Height="22" HorizontalAlignment="Center" />
+                    <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="Medium" HorizontalAlignment="Center" />
+                  </StackPanel>
+                  <controls:Badge Classes="small" Kind="Accent" Text="{Binding UnreadCount}" HorizontalAlignment="Right"
+                                  VerticalAlignment="Top" Margin="0,-5,9,0" IsVisible="{Binding HasUnread}" />
+                </Panel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </DockPanel>
+
+      <!-- Меню аккаунтов -->
+      <Popup x:Name="AccountMenu" PlacementTarget="{Binding #AccountButton}" Placement="RightEdgeAlignedTop" HorizontalOffset="8"
+             IsLightDismissEnabled="True" IsOpen="{Binding IsAccountMenuOpen, Mode=TwoWay}">
+        <Border Classes="menuCard" Width="290" Margin="12">
+          <StackPanel>
+            <TextBlock Text="{l:Tr Panel_Accounts}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Mg.MetaBrush}"
+                       Margin="10,6,10,6" />
+            <ItemsControl ItemsSource="{Binding AccountItems}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:AccountItemViewModel">
+                  <Button Theme="{StaticResource Mg.MenuItemButton}" Height="54" Command="{Binding SwitchCommand}"
+                          HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding Name}">
+                    <DockPanel>
+                      <controls:Avatar DockPanel.Dock="Left" Size="36" Margin="0,0,12,0" Initials="{Binding Initials}"
+                                       Background="{DynamicResource Mg.InsetBrush}" Foreground="{DynamicResource Mg.TextBrush}" />
+                      <controls:SvgIcon DockPanel.Dock="Right" Source="avares://MeowGram/Assets/icons/check.svg" Width="18" Height="18"
+                                        Foreground="{DynamicResource Mg.AccentBrush}" IsVisible="{Binding IsActive}" />
+                      <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontSize="14.5" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Phone}" FontSize="12.5" Foreground="{DynamicResource Mg.TextSecondaryBrush}" />
+                      </StackPanel>
+                    </DockPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Border Height="1" Margin="8,4" Background="{DynamicResource Mg.LineBrush}" />
+            <Button Theme="{StaticResource Mg.MenuItemButton}" Command="{Binding AddAccountCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/plus.svg" Width="17" Height="17" />
+                <TextBlock Text="{l:Tr Account_Add}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button Theme="{StaticResource Mg.MenuItemButton}" Classes="danger" Command="{Binding LogOutCommand}"
+                    IsEnabled="{Binding !IsBusy}">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/arrow-left.svg" Width="17" Height="17" />
+                <TextBlock Text="{l:Tr Account_LogOut}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Border>
+      </Popup>
+
+      <!-- ── Список / поиск ───────────────────────────────────────────── -->
+      <Panel Grid.Column="2">
+        <views:ChatListPanel x:Name="ListView" IsVisible="{Binding !IsSearchOpen}" />
+        <Panel IsVisible="{Binding IsSearchOpen}">
+          <views:SearchPanel x:Name="SearchView" DataContext="{Binding Search}" />
+        </Panel>
+      </Panel>
+
+      <!-- ── Центр: окна чатов ────────────────────────────────────────── -->
+      <Panel x:Name="Center" Grid.Column="4">
+        <!-- Нет открытых окон -->
+        <Border CornerRadius="28" Background="{DynamicResource Mg.SurfaceBrush}" Padding="32"
+                IsVisible="{Binding Split.IsEmpty, FallbackValue=True}">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
+            <Image Source="avares://MeowGram/Assets/icons/BigLogo.png" Width="144" Height="144" Margin="0,0,0,-14"
+                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+            <StackPanel Spacing="8" HorizontalAlignment="Center">
+              <TextBlock Classes="title" Text="{l:Tr Empty_Title}" HorizontalAlignment="Center" />
+              <TextBlock Text="{l:Tr Empty_Text}" FontSize="15" LineHeight="22.5" MaxWidth="360" TextWrapping="Wrap"
+                         TextAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource Mg.TextSecondaryBrush}" />
+            </StackPanel>
+            <Button Theme="{StaticResource Mg.SecondaryButton}" HorizontalAlignment="Center" Padding="22,0"
+                    Command="{Binding NewMessageCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/pencil.svg" Width="18" Height="18" />
+                <TextBlock Text="{l:Tr Empty_NewMessage}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <WrapPanel HorizontalAlignment="Center" Margin="0,14,0,0" ItemSpacing="18" LineSpacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Classes="keycap"><TextBlock Text="Ctrl K" /></Border>
+                <TextBlock Text="{l:Tr Hint_Search}" FontSize="13" Foreground="{DynamicResource Mg.TextSecondaryBrush}" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Classes="keycap"><TextBlock Text="Ctrl 1–6" /></Border>
+                <TextBlock Text="{l:Tr Hint_Folders}" FontSize="13" Foreground="{DynamicResource Mg.TextSecondaryBrush}" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Classes="keycap"><TextBlock Text="Alt 1–4" /></Border>
+                <TextBlock Text="{l:Tr Hint_Windows}" FontSize="13" Foreground="{DynamicResource Mg.TextSecondaryBrush}" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border Classes="keycap"><TextBlock Text="Esc" /></Border>
+                <TextBlock Text="{l:Tr Hint_CloseChat}" FontSize="13" Foreground="{DynamicResource Mg.TextSecondaryBrush}" VerticalAlignment="Center" />
+              </StackPanel>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <ItemsControl x:Name="Cells" ItemsSource="{Binding Split.Cells, FallbackValue={x:Null}}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <controls:SplitGrid Gap="12" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.DataTemplates>
+            <DataTemplate DataType="vm:ChatPaneViewModel">
+              <views:ChatPaneView />
+            </DataTemplate>
+            <DataTemplate DataType="vm:SplitGhostViewModel">
+              <Panel Classes="ghost" Classes.hot="{Binding Owner.IsGhostHot}">
+                <Rectangle Classes="fill" RadiusX="24" RadiusY="24" Fill="{DynamicResource Mg.SurfaceBrush}" />
+                <Rectangle Classes="tint" RadiusX="24" RadiusY="24" Fill="{DynamicResource Mg.AccentBrush}" />
+                <Rectangle Classes="stroke" RadiusX="24" RadiusY="24" StrokeThickness="2" StrokeDashArray="4,3" />
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="24">
+                  <Border Width="56" Height="56" CornerRadius="18" Background="{DynamicResource Mg.InsetBrush}" HorizontalAlignment="Center">
+                    <controls:SvgIcon Classes="ghostIcon" Source="avares://MeowGram/Assets/icons/split-add.svg" Width="26" Height="26" />
+                  </Border>
+                  <TextBlock Text="{l:Tr Split_ReleaseBeside}" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"
+                             TextAlignment="Center" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Owner.GhostCaption}" FontSize="13" HorizontalAlignment="Center"
+                             Foreground="{DynamicResource Mg.TextSecondaryBrush}" />
+                </StackPanel>
+              </Panel>
+            </DataTemplate>
+          </ItemsControl.DataTemplates>
+        </ItemsControl>
+
+        <!-- Накладки «Открыть вместо / Поменять местами» над окнами во время перетаскивания -->
+        <Canvas x:Name="DropLayer" IsHitTestVisible="False" />
+      </Panel>
+
+      <!-- ── Инфо-панель ──────────────────────────────────────────────── -->
+      <Panel x:Name="InfoHost" Grid.Column="5" Width="332" IsVisible="{Binding IsInfoOpen}" HorizontalAlignment="Right">
+        <views:InfoPanelView x:Name="InfoView" Margin="12,0,0,0" DataContext="{Binding Info}" />
+      </Panel>
+    </Grid>
+
+    <!-- ── Пересылка ─────────────────────────────────────────────────── -->
+    <Panel Background="#80000000" IsVisible="{Binding ForwardPicker, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <Border Width="420" Height="560" CornerRadius="28" Background="{DynamicResource Mg.SurfaceBrush}" Padding="18,16"
+              BoxShadow="0 24 64 0 #66000000" DataContext="{Binding ForwardPicker}">
+        <DockPanel x:DataType="vm:ForwardPickerViewModel">
+          <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <Button DockPanel.Dock="Right" Theme="{StaticResource Mg.IconButton}" Width="36" Height="36"
+                    Command="{Binding CancelCommand}" ToolTip.Tip="{l:Tr Tip_Close}" AutomationProperties.Name="{l:Tr Tip_Close}">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="18" Height="18" />
+            </Button>
+            <TextBlock Classes="title" FontSize="22" Text="{l:Tr Forward_Title}" VerticalAlignment="Center" />
+          </DockPanel>
+          <Border DockPanel.Dock="Top" Height="44" CornerRadius="14" Background="{DynamicResource Mg.InsetBrush}" Padding="14,0"
+                  Margin="0,0,0,10">
+            <DockPanel>
+              <controls:SvgIcon DockPanel.Dock="Left" Source="avares://MeowGram/Assets/icons/chat-search.svg" Width="18" Height="18"
+                                Foreground="{DynamicResource Mg.TextMutedBrush}" />
+              <TextBox Theme="{StaticResource Mg.BareTextBox}" Margin="10,0,0,0" Text="{Binding Query}"
+                       PlaceholderText="{l:Tr Forward_Search}" AutomationProperties.Name="{l:Tr Forward_Search}" />
+            </DockPanel>
+          </Border>
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Chats}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:ChatRowViewModel">
+                  <Button Theme="{StaticResource Mg.ChatRow}" Padding="10,8" Margin="0,0,0,2"
+                          Command="{Binding $parent[ItemsControl].((vm:ForwardPickerViewModel)DataContext).PickCommand, FallbackValue={x:Null}}"
+                          CommandParameter="{Binding}" AutomationProperties.Name="{Binding Title}">
+                    <DockPanel>
+                      <controls:Avatar DockPanel.Dock="Left" Size="44" Margin="0,0,12,0" Initials="{Binding Initials}"
+                                       Image="{Binding Photo}" Background="{Binding AvatarBackground}" />
+                      <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Medium" VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+    </Panel>
+
+    <!-- ── Слой перетаскивания ───────────────────────────────────────── -->
+    <Canvas x:Name="DragCanvas" IsHitTestVisible="False">
+      <controls:JellyDragCard x:Name="DragCard">
+        <ContentControl x:Name="DragContent" ContentTemplate="{StaticResource DragCardTemplate}" />
+      </controls:JellyDragCard>
+    </Canvas>
+  </Panel>
+</UserControl>

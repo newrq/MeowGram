@@ -1,0 +1,154 @@
+<!--
+  Поиск вместо списка чатов (макет Search): назад, поле с рамкой акцента, вкладки, разделы «Чаты и контакты»,
+  «Глобальный поиск», «Сообщения · N» с подсветкой совпадений.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MeowGram.ViewModels.Messenger"
+             xmlns:controls="using:MeowGram.Controls"
+             xmlns:l="using:MeowGram.Localization"
+             x:Class="MeowGram.Views.Messenger.SearchPanel"
+             x:DataType="vm:SearchViewModel"
+             x:CompileBindings="True">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.MetaBrush}" />
+      <Setter Property="Margin" Value="12,14,12,6" />
+    </Style>
+    <Style Selector="TextBlock.itemSub">
+      <Setter Property="FontSize" Value="13.5" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextSecondaryBrush}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    <Style Selector="Button.hit">
+      <Setter Property="Padding" Value="12,8" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel>
+    <!-- Назад + поле -->
+    <Grid DockPanel.Dock="Top" Height="44" Margin="0,0,0,12" ColumnDefinitions="Auto,*">
+      <Button x:Name="BackButton" Theme="{StaticResource Mg.IconButton}" Margin="0,0,8,0"
+              Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+              ToolTip.Tip="{l:Tr Tip_BackToChats}" AutomationProperties.Name="{l:Tr Tip_BackToChats}">
+        <controls:SvgIcon Source="avares://MeowGram/Assets/icons/arrow-left.svg" Width="20" Height="20" />
+      </Button>
+      <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource Mg.SurfaceBrush}"
+              BorderBrush="{DynamicResource Mg.AccentBrush}" BorderThickness="2" Padding="12,0,4,0">
+        <DockPanel>
+          <controls:SvgIcon DockPanel.Dock="Left" Source="avares://MeowGram/Assets/icons/chat-search.svg"
+                            Width="18" Height="18" Foreground="{DynamicResource Mg.TextMutedBrush}" />
+          <Button DockPanel.Dock="Right" Theme="{StaticResource Mg.IconButton}" Width="32" Height="32" CornerRadius="10"
+                  Command="{Binding ClearCommand}" IsVisible="{Binding Query, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  ToolTip.Tip="{l:Tr Tip_Clear}" AutomationProperties.Name="{l:Tr Tip_Clear}">
+            <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="16" Height="16" />
+          </Button>
+          <TextBox x:Name="QueryBox" Theme="{StaticResource Mg.BareTextBox}" Margin="10,0,4,0"
+                   Text="{Binding Query}" PlaceholderText="{l:Tr Search_Placeholder}"
+                   AutomationProperties.Name="{l:Tr Search_Placeholder}" />
+        </DockPanel>
+      </Border>
+    </Grid>
+
+    <!-- Вкладки -->
+    <WrapPanel DockPanel.Dock="Top" Margin="2,0,2,4" ItemSpacing="6" LineSpacing="6">
+      <Button Theme="{StaticResource Mg.PillTab}" Content="{l:Tr Search_TabAll}" Classes="tab" Tag="{x:Static vm:SearchTab.All}"
+              Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:SearchTab.All}" />
+      <Button Theme="{StaticResource Mg.PillTab}" Content="{l:Tr Search_TabChats}" Classes="tab" Tag="{x:Static vm:SearchTab.Chats}"
+              Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:SearchTab.Chats}" />
+      <Button Theme="{StaticResource Mg.PillTab}" Content="{l:Tr Search_TabMedia}" Classes="tab" Tag="{x:Static vm:SearchTab.Media}"
+              Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:SearchTab.Media}" />
+      <Button Theme="{StaticResource Mg.PillTab}" Content="{l:Tr Search_TabLinks}" Classes="tab" Tag="{x:Static vm:SearchTab.Links}"
+              Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:SearchTab.Links}" />
+      <Button Theme="{StaticResource Mg.PillTab}" Content="{l:Tr Search_TabFiles}" Classes="tab" Tag="{x:Static vm:SearchTab.Files}"
+              Command="{Binding SetTabCommand}" CommandParameter="{x:Static vm:SearchTab.Files}" />
+    </WrapPanel>
+
+    <Panel>
+      <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="2">
+          <!-- Чаты и контакты -->
+          <TextBlock Classes="section" Margin="12,10,12,6" Text="{Binding ChatsHeader}" IsVisible="{Binding ShowChats}" />
+          <ItemsControl ItemsSource="{Binding Chats}" IsVisible="{Binding ShowChats}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:SearchChatItem">
+                <Button Theme="{StaticResource Mg.ChatRow}" Classes="hit" Margin="0,0,0,2"
+                        Command="{Binding $parent[UserControl].((vm:SearchViewModel)DataContext).OpenChatCommand, FallbackValue={x:Null}}"
+                        CommandParameter="{Binding}" AutomationProperties.Name="{Binding Row.Title}">
+                  <DockPanel>
+                    <controls:Avatar DockPanel.Dock="Left" Size="44" Margin="0,0,12,0" Initials="{Binding Row.Initials}"
+                                     Image="{Binding Row.Photo}" Background="{Binding Row.AvatarBackground}" />
+                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                      <controls:HighlightText FontSize="15" FontWeight="Medium" TextTrimming="CharacterEllipsis"
+                                              Segments="{Binding TitleSegments}" MarkBrush="{DynamicResource Mg.SelectionBrush}" />
+                      <TextBlock Classes="itemSub" Text="{Binding Subtitle}" />
+                    </StackPanel>
+                  </DockPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <!-- Глобальный поиск -->
+          <TextBlock Classes="section" Text="{l:Tr Search_Global}" IsVisible="{Binding ShowGlobal}" />
+          <ItemsControl ItemsSource="{Binding Global}" IsVisible="{Binding ShowGlobal}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:SearchChatItem">
+                <Button Theme="{StaticResource Mg.ChatRow}" Classes="hit" Margin="0,0,0,2"
+                        Command="{Binding $parent[UserControl].((vm:SearchViewModel)DataContext).OpenChatCommand, FallbackValue={x:Null}}"
+                        CommandParameter="{Binding}" AutomationProperties.Name="{Binding Row.Title}">
+                  <DockPanel>
+                    <controls:Avatar DockPanel.Dock="Left" Size="44" Margin="0,0,12,0" Initials="{Binding Row.Initials}"
+                                     Image="{Binding Row.Photo}" Background="{Binding Row.AvatarBackground}" />
+                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                      <controls:HighlightText FontSize="15" FontWeight="Medium" TextTrimming="CharacterEllipsis"
+                                              Segments="{Binding TitleSegments}" MarkBrush="{DynamicResource Mg.SelectionBrush}" />
+                      <TextBlock Classes="itemSub" Text="{Binding Subtitle}" />
+                    </StackPanel>
+                  </DockPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <!-- Сообщения -->
+          <TextBlock Classes="section" Text="{Binding MessagesHeader}" IsVisible="{Binding ShowMessages}" />
+          <ItemsControl ItemsSource="{Binding Messages}" IsVisible="{Binding ShowMessages}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:SearchMessageItem">
+                <Button Theme="{StaticResource Mg.ChatRow}" Classes="hit" Margin="0,0,0,2"
+                        Command="{Binding $parent[UserControl].((vm:SearchViewModel)DataContext).OpenMessageCommand, FallbackValue={x:Null}}"
+                        CommandParameter="{Binding}" AutomationProperties.Name="{Binding Row.Title}">
+                  <DockPanel>
+                    <controls:Avatar DockPanel.Dock="Left" Size="44" Margin="0,0,12,0" Initials="{Binding Row.Initials}"
+                                     Image="{Binding Row.Photo}" Background="{Binding Row.AvatarBackground}" />
+                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                      <DockPanel>
+                        <TextBlock DockPanel.Dock="Right" Margin="6,0,0,0" FontSize="12.5" Foreground="{DynamicResource Mg.MetaBrush}"
+                                   Text="{Binding Time}" />
+                        <TextBlock FontSize="15" FontWeight="Medium" TextTrimming="CharacterEllipsis" Text="{Binding Row.Title}" />
+                      </DockPanel>
+                      <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Classes="itemSub" Margin="0,0,4,0"
+                                   Foreground="{DynamicResource Mg.TextBrush}" Text="{Binding Prefix}" IsVisible="{Binding HasPrefix}" />
+                        <controls:HighlightText Classes="itemSub" FontSize="13.5" Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                                                TextTrimming="CharacterEllipsis" Segments="{Binding Snippet}"
+                                                MarkBrush="{DynamicResource Mg.SelectionBrush}" />
+                      </DockPanel>
+                    </StackPanel>
+                  </DockPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+
+      <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Classes="body secondary"
+                 Text="{l:Tr Search_Nothing}" IsVisible="{Binding IsNothingFound}" />
+    </Panel>
+  </DockPanel>
+</UserControl>

@@ -56,6 +56,7 @@ public sealed class ChatStore
     private readonly Dictionary<long, TdApi.Supergroup> _supergroups = [];
     private readonly Dictionary<long, List<ChatActionInfo>> _actions = [];
     private readonly Dictionary<Type, int> _scopeMuteFor = [];
+    private readonly Dictionary<long, int> _onlineCounts = [];
     private readonly Dictionary<ChatListKind, long[]> _sorted = [];
     private readonly TimeProvider _time;
 
@@ -123,6 +124,23 @@ public sealed class ChatStore
         TdApi.ChatType.ChatTypeSupergroup or TdApi.ChatType.ChatTypeBasicGroup => ChatCategory.Group,
         _ => ChatCategory.Private,
     };
+
+    /// <summary>Сколько участников группы в сети (TDLib присылает только для открытых чатов), 0 — неизвестно.</summary>
+    public int GetOnlineMemberCount(long chatId) => _onlineCounts.GetValueOrDefault(chatId);
+
+    /// <summary>Число участников группы или подписчиков канала, 0 — неизвестно.</summary>
+    public int GetMemberCount(long chatId) => GetChat(chatId)?.Type switch
+    {
+        TdApi.ChatType.ChatTypeBasicGroup b => GetBasicGroup(b.BasicGroupId)?.MemberCount ?? 0,
+        TdApi.ChatType.ChatTypeSupergroup s => GetSupergroup(s.SupergroupId)?.MemberCount ?? 0,
+        _ => 0,
+    };
+
+    /// <summary>Чат группы (базовой или супергруппы) с этим id группы — для пересылки GroupChanged в строки списка.</summary>
+    public IEnumerable<long> ChatsOfGroup(long groupId) => _chats.Values
+        .Where(c => c.Type is TdApi.ChatType.ChatTypeBasicGroup b && b.BasicGroupId == groupId
+                    || c.Type is TdApi.ChatType.ChatTypeSupergroup s && s.SupergroupId == groupId)
+        .Select(c => c.Id);
 
     /// <summary>Собеседник личного или секретного чата.</summary>
     public long? GetPrivateUserId(long chatId) => GetChat(chatId)?.Type switch
@@ -248,6 +266,12 @@ public sealed class ChatStore
 
             case TdApi.Update.UpdateChatAction u:
                 ApplyAction(u);
+                break;
+
+            case TdApi.Update.UpdateChatOnlineMemberCount u:
+                _onlineCounts[u.ChatId] = u.OnlineMemberCount;
+                if (_chats.ContainsKey(u.ChatId))
+                    ChatChanged?.Invoke(u.ChatId);
                 break;
 
             case TdApi.Update.UpdateUser u:

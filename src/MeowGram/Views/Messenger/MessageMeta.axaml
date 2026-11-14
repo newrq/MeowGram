@@ -1,0 +1,20 @@
+<!-- Время и галочки сообщения: «10:45 ✓✓». Цвет — Mg.InMeta / Mg.OutMeta (наследуется от пузыря). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:feed="using:MeowGram.ViewModels.Messenger.Feed"
+             xmlns:controls="using:MeowGram.Controls"
+             xmlns:l="using:MeowGram.Localization"
+             x:Class="MeowGram.Views.Messenger.MessageMeta"
+             x:DataType="feed:MessageViewModel"
+             x:CompileBindings="True"
+             IsHitTestVisible="False">
+  <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Bottom">
+    <TextBlock Text="{Binding Time}" FontSize="12" VerticalAlignment="Center" />
+    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/status-sending.svg" Width="15" Height="15"
+                      IsVisible="{Binding IsSending}" AutomationProperties.Name="{l:Tr Status_Sending}" />
+    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/status-sent.svg" Width="16" Height="16"
+                      IsVisible="{Binding IsSent}" AutomationProperties.Name="{l:Tr Status_Sent}" />
+    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/status-read.svg" Width="16" Height="16"
+                      IsVisible="{Binding IsRead}" AutomationProperties.Name="{l:Tr Status_Read}" />
+  </StackPanel>
+</UserControl>

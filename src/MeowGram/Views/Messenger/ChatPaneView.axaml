@@ -1,0 +1,710 @@
+<!--
+  Окно чата (макеты Main / Group / Split / States / Voice): шапка (широкая — одно окно, компактная — сплит),
+  закреплённое сообщение, поиск по чату, лента (плашки дней, «Непрочитанные», служебные, пузыри всех типов),
+  «печатает», кнопка «вниз», поле ввода с ответом/редактированием.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MeowGram.ViewModels.Messenger"
+             xmlns:feed="using:MeowGram.ViewModels.Messenger.Feed"
+             xmlns:controls="using:MeowGram.Controls"
+             xmlns:views="using:MeowGram.Views.Messenger"
+             xmlns:l="using:MeowGram.Localization"
+             x:Class="MeowGram.Views.Messenger.ChatPaneView"
+             x:DataType="vm:ChatPaneViewModel"
+             x:CompileBindings="True">
+
+  <UserControl.Styles>
+    <!-- Карточка окна: активное окно в сплите обведено акцентом. -->
+    <Style Selector="Border#Card">
+      <Setter Property="Background" Value="{DynamicResource Mg.SurfaceBrush}" />
+      <Setter Property="CornerRadius" Value="28" />
+      <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="Border#Card.compact">
+      <Setter Property="CornerRadius" Value="24" />
+    </Style>
+    <Style Selector="Border#Ring">
+      <Setter Property="CornerRadius" Value="28" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.AccentBrush}" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border#Ring.compact">
+      <Setter Property="CornerRadius" Value="24" />
+    </Style>
+    <Style Selector="Border#Ring.shown">
+      <Setter Property="Opacity" Value="0.6" />
+    </Style>
+
+    <!-- Пузыри -->
+    <Style Selector="Border.bubble">
+      <Setter Property="Background" Value="{DynamicResource Mg.InBubbleBrush}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource Mg.InTextBrush}" />
+      <Setter Property="Padding" Value="14,8,12,7" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="BackEaseOut" />
+        </Transitions>
+      </Setter>
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="Border.bubble.out">
+      <Setter Property="Background" Value="{DynamicResource Mg.OutBubbleBrush}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource Mg.OutTextBrush}" />
+    </Style>
+    <Style Selector="Border.bubble.media">
+      <Setter Property="Padding" Value="4" />
+    </Style>
+    <Style Selector="Border.bubble.bare">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="Border.bubble.hl">
+      <Setter Property="RenderTransform" Value="scale(1.03)" />
+    </Style>
+    <Style Selector="Border.bubble views|MessageMeta">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.InMetaBrush}" />
+    </Style>
+    <Style Selector="Border.bubble.out views|MessageMeta">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OutMetaBrush}" />
+    </Style>
+    <Style Selector="Border.bubble TextBlock.meta">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.InMetaBrush}" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="Border.bubble.out TextBlock.meta">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OutMetaBrush}" />
+    </Style>
+    <Style Selector="Border.bubble Border.quote">
+      <Setter Property="Background" Value="{DynamicResource Mg.InQuoteBrush}" />
+      <Setter Property="CornerRadius" Value="12" />
+    </Style>
+    <Style Selector="Border.bubble.out Border.quote">
+      <Setter Property="Background" Value="{DynamicResource Mg.OutQuoteBrush}" />
+    </Style>
+    <Style Selector="Border.bubble TextBlock.name">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.NameBrush}" />
+    </Style>
+    <Style Selector="Border.bubble.out TextBlock.name">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OutTextBrush}" />
+    </Style>
+    <Style Selector="Border.bubble Ellipse.bean">
+      <Setter Property="Fill" Value="{DynamicResource Mg.InTextBrush}" />
+    </Style>
+    <Style Selector="Border.bubble.out Ellipse.bean">
+      <Setter Property="Fill" Value="{DynamicResource Mg.OutTextBrush}" />
+    </Style>
+    <Style Selector="Grid.msg">
+      <Setter Property="Margin" Value="0,0,0,3" />
+    </Style>
+    <Style Selector="Grid.msg.ends">
+      <Setter Property="Margin" Value="0,0,0,14" />
+    </Style>
+
+    <!-- Реакции -->
+    <Style Selector="Button.reaction">
+      <Setter Property="Height" Value="26" />
+      <Setter Property="Padding" Value="7,0,9,0" />
+      <Setter Property="CornerRadius" Value="13" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Background" Value="{DynamicResource Mg.InQuoteBrush}" />
+    </Style>
+    <Style Selector="Border.bubble.out Button.reaction">
+      <Setter Property="Background" Value="{DynamicResource Mg.OutQuoteBrush}" />
+    </Style>
+    <Style Selector="Button.reaction.chosen">
+      <Setter Property="Background" Value="{DynamicResource Mg.AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+    </Style>
+
+    <!-- Плашки ленты -->
+    <Style Selector="Border.pill">
+      <Setter Property="Background" Value="{DynamicResource Mg.BgBrush}" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="12,5" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.pill TextBlock">
+      <Setter Property="FontSize" Value="12.5" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.MetaBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="TextBlock.headerStatus">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.MetaBrush}" />
+    </Style>
+    <Style Selector="TextBlock.headerStatus.online">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OnlineBrush}" />
+    </Style>
+    <Style Selector="TextBlock.headerStatus.accent">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.AccentBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Panel>
+    <Border x:Name="Card" Classes.compact="{Binding IsCompact}">
+      <DockPanel>
+
+        <!-- ── Шапка: одно окно ─────────────────────────────────────── -->
+        <Border DockPanel.Dock="Top" Height="68" Padding="20,0,12,0" BorderBrush="{DynamicResource Mg.LineBrush}"
+                BorderThickness="0,0,0,1" IsVisible="{Binding IsWide}">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="0">
+              <Button Theme="{StaticResource Mg.IconButton}" Command="{Binding ToggleSearchCommand}" Classes.active="{Binding IsSearching}"
+                      ToolTip.Tip="{l:Tr Tip_SearchInChat}" AutomationProperties.Name="{l:Tr Tip_SearchInChat}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-search.svg" Width="20" Height="20" />
+              </Button>
+              <Button Theme="{StaticResource Mg.IconButton}" IsVisible="{Binding !IsGroup}"
+                      ToolTip.Tip="{l:Tr Common_Soon}" AutomationProperties.Name="{l:Tr Tip_Call}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-call.svg" Width="20" Height="20" />
+              </Button>
+              <Button Theme="{StaticResource Mg.IconButton}" Command="{Binding ToggleInfoCommand}" Classes.active="{Binding IsInfoOpen}"
+                      ToolTip.Tip="{l:Tr Tip_Profile}" AutomationProperties.Name="{l:Tr Tip_Profile}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-panel.svg" Width="20" Height="20" />
+              </Button>
+              <Button x:Name="MoreButton" Theme="{StaticResource Mg.IconButton}"
+                      ToolTip.Tip="{l:Tr Tip_More}" AutomationProperties.Name="{l:Tr Tip_More}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-more.svg" Width="20" Height="20" />
+              </Button>
+            </StackPanel>
+            <Button x:Name="WideHeader" Theme="{StaticResource Mg.PlainButton}" Classes="paneHeader" Cursor="Arrow"
+                    HorizontalContentAlignment="Left" Command="{Binding ToggleInfoCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Panel Width="40" Height="40">
+                  <controls:Avatar Size="40" Initials="{Binding Row.Initials}" Image="{Binding Row.Photo}"
+                                   Background="{Binding Row.AvatarBackground}" IsVisible="{Binding !Row.IsSaved}" />
+                  <Border IsVisible="{Binding Row.IsSaved}" CornerRadius="20" Background="{DynamicResource Mg.AccentBrush}">
+                    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/bookmark.svg" Width="18" Height="18"
+                                      Foreground="{DynamicResource Mg.OnAccentBrush}" />
+                  </Border>
+                </Panel>
+                <StackPanel VerticalAlignment="Center" Spacing="1">
+                  <TextBlock Text="{Binding Row.Title}" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Classes="headerStatus" Classes.online="{Binding HeaderStatusIsOnline}"
+                             Classes.accent="{Binding HeaderStatusIsAccent}" FontSize="13" Text="{Binding HeaderStatus}"
+                             IsVisible="{Binding HeaderStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+              </StackPanel>
+            </Button>
+          </DockPanel>
+        </Border>
+
+        <!-- ── Шапка: сплит ─────────────────────────────────────────── -->
+        <Border DockPanel.Dock="Top" Height="58" Padding="12,0,10,0" BorderBrush="{DynamicResource Mg.LineBrush}"
+                BorderThickness="0,0,0,1" IsVisible="{Binding IsCompact}">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <Button Theme="{StaticResource Mg.IconButton}" Width="34" Height="34" CornerRadius="10"
+                      Command="{Binding ToggleSearchCommand}" Classes.active="{Binding IsSearching}"
+                      ToolTip.Tip="{l:Tr Tip_SearchInChat}" AutomationProperties.Name="{l:Tr Tip_SearchInChat}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chat-search.svg" Width="18" Height="18" />
+              </Button>
+              <Button Theme="{StaticResource Mg.FilledIconButton}" Classes="inset" Width="34" Height="34" CornerRadius="10"
+                      Command="{Binding ClosePaneCommand}"
+                      ToolTip.Tip="{l:Tr Tip_CloseWindow}" AutomationProperties.Name="{l:Tr Tip_CloseWindow}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="16" Height="16" />
+              </Button>
+            </StackPanel>
+            <Button x:Name="CompactHeader" Theme="{StaticResource Mg.SurfaceButton}" Classes="paneHeader" Height="46"
+                    Padding="6,0" CornerRadius="12" HorizontalContentAlignment="Left" Margin="0,0,8,0"
+                    ToolTip.Tip="{l:Tr Tip_PaneHeader}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Border Width="22" Height="22" CornerRadius="7" VerticalAlignment="Center"
+                        Background="{DynamicResource Mg.InsetBrush}" Classes.activeSlot="{Binding IsActive}">
+                  <Border.Styles>
+                    <Style Selector="Border.activeSlot">
+                      <Setter Property="Background" Value="{DynamicResource Mg.AccentBrush}" />
+                    </Style>
+                    <Style Selector="Border.activeSlot > TextBlock">
+                      <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+                    </Style>
+                  </Border.Styles>
+                  <TextBlock Text="{Binding Slot}" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center"
+                             VerticalAlignment="Center" Foreground="{DynamicResource Mg.TextSecondaryBrush}" />
+                </Border>
+                <controls:Avatar Size="34" Initials="{Binding Row.Initials}" Image="{Binding Row.Photo}"
+                                 Background="{Binding Row.AvatarBackground}" />
+                <StackPanel VerticalAlignment="Center" Spacing="1">
+                  <TextBlock Text="{Binding Row.Title}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Classes="headerStatus" Classes.online="{Binding HeaderStatusIsOnline}"
+                             Classes.accent="{Binding HeaderStatusIsAccent}" FontSize="12.5" TextTrimming="CharacterEllipsis"
+                             Text="{Binding HeaderStatus}"
+                             IsVisible="{Binding HeaderStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+              </StackPanel>
+            </Button>
+          </DockPanel>
+        </Border>
+
+        <!-- ── Поиск по чату ───────────────────────────────────────── -->
+        <Border DockPanel.Dock="Top" Padding="16,8,12,8" BorderBrush="{DynamicResource Mg.LineBrush}" BorderThickness="0,0,0,1"
+                IsVisible="{Binding IsSearching}">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+              <TextBlock Text="{Binding SearchStatus}" FontSize="13" Foreground="{DynamicResource Mg.MetaBrush}"
+                         VerticalAlignment="Center" Margin="8,0" />
+              <Button Theme="{StaticResource Mg.IconButton}" Width="32" Height="32" CornerRadius="10"
+                      Command="{Binding SearchNextCommand}" AutomationProperties.Name="{l:Tr Tip_SearchOlder}"
+                      ToolTip.Tip="{l:Tr Tip_SearchOlder}" RenderTransform="rotate(180deg)">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chevron-down.svg" Width="18" Height="18" />
+              </Button>
+              <Button Theme="{StaticResource Mg.IconButton}" Width="32" Height="32" CornerRadius="10"
+                      Command="{Binding SearchPreviousCommand}" AutomationProperties.Name="{l:Tr Tip_SearchNewer}"
+                      ToolTip.Tip="{l:Tr Tip_SearchNewer}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chevron-down.svg" Width="18" Height="18" />
+              </Button>
+              <Button Theme="{StaticResource Mg.IconButton}" Width="32" Height="32" CornerRadius="10"
+                      Command="{Binding ToggleSearchCommand}" AutomationProperties.Name="{l:Tr Tip_Close}"
+                      ToolTip.Tip="{l:Tr Tip_Close}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="16" Height="16" />
+              </Button>
+            </StackPanel>
+            <Border CornerRadius="12" Background="{DynamicResource Mg.InsetBrush}" Padding="12,0" Height="38">
+              <DockPanel>
+                <controls:SvgIcon DockPanel.Dock="Left" Source="avares://MeowGram/Assets/icons/chat-search.svg"
+                                  Width="16" Height="16" Foreground="{DynamicResource Mg.TextMutedBrush}" />
+                <TextBox x:Name="SearchBox" Theme="{StaticResource Mg.BareTextBox}" Margin="8,0,0,0" FontSize="14"
+                         Text="{Binding SearchQuery}" PlaceholderText="{l:Tr Search_InChatPlaceholder}"
+                         AutomationProperties.Name="{l:Tr Search_InChatPlaceholder}" />
+              </DockPanel>
+            </Border>
+          </DockPanel>
+        </Border>
+
+        <!-- ── Закреплённое сообщение ──────────────────────────────── -->
+        <Border DockPanel.Dock="Top" Padding="20,8,12,8" BorderBrush="{DynamicResource Mg.LineBrush}" BorderThickness="0,0,0,1"
+                IsVisible="{Binding ShowPinned}">
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Theme="{StaticResource Mg.IconButton}" Width="36" Height="36" CornerRadius="10"
+                    Command="{Binding HidePinnedCommand}" ToolTip.Tip="{l:Tr Tip_HidePinned}"
+                    AutomationProperties.Name="{l:Tr Tip_HidePinned}">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="16" Height="16" />
+            </Button>
+            <Button Theme="{StaticResource Mg.PlainButton}" Command="{Binding OpenPinnedCommand}" HorizontalContentAlignment="Left"
+                    AutomationProperties.Name="{l:Tr Pinned_Title}">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Border Width="32" Height="32" CornerRadius="10" Background="{DynamicResource Mg.InsetBrush}">
+                  <controls:SvgIcon Source="avares://MeowGram/Assets/icons/pin.svg" Width="16" Height="16"
+                                    Foreground="{DynamicResource Mg.AccentBrush}" />
+                </Border>
+                <StackPanel VerticalAlignment="Center" Spacing="1">
+                  <TextBlock Text="{l:Tr Pinned_Title}" FontSize="12.5" FontWeight="SemiBold" Foreground="{DynamicResource Mg.NameBrush}" />
+                  <TextBlock Text="{Binding PinnedText}" FontSize="14" Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                             TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+              </StackPanel>
+            </Button>
+          </DockPanel>
+        </Border>
+
+        <!-- ── Поле ввода ──────────────────────────────────────────── -->
+        <StackPanel DockPanel.Dock="Bottom" IsVisible="{Binding CanWrite}">
+          <!-- Ответ / редактирование -->
+          <DockPanel Margin="24,6,16,0" IsVisible="{Binding HasComposerContext}">
+            <Button DockPanel.Dock="Right" Theme="{StaticResource Mg.IconButton}" Width="32" Height="32" CornerRadius="10"
+                    Command="{Binding CancelComposerContextCommand}" ToolTip.Tip="{l:Tr Tip_Cancel}"
+                    AutomationProperties.Name="{l:Tr Tip_Cancel}">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/close.svg" Width="16" Height="16" />
+            </Button>
+            <Panel DockPanel.Dock="Left" Width="18" Height="18" Margin="0,0,10,0">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/reply.svg" Foreground="{DynamicResource Mg.AccentBrush}"
+                                Width="18" Height="18" IsVisible="{Binding !IsEditingMode}" />
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/pencil.svg" Foreground="{DynamicResource Mg.AccentBrush}"
+                                Width="18" Height="18" IsVisible="{Binding IsEditingMode}" />
+            </Panel>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{Binding ComposerContextTitle}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Mg.NameBrush}" />
+              <TextBlock Text="{Binding ComposerContextText}" FontSize="13.5" Foreground="{DynamicResource Mg.TextSecondaryBrush}"
+                         TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+          </DockPanel>
+
+          <Grid x:Name="ComposerRow" ColumnDefinitions="Auto,*,Auto" Margin="16,10,16,16" Classes.compact="{Binding IsCompact}">
+            <Grid.Styles>
+              <Style Selector="Grid.compact">
+                <Setter Property="Margin" Value="10,6,10,10" />
+              </Style>
+            </Grid.Styles>
+            <Button x:Name="AttachButton" Theme="{StaticResource Mg.IconButton}" Classes="round" Width="48" Height="48"
+                    CornerRadius="24" VerticalAlignment="Bottom" Margin="0,0,8,0"
+                    ToolTip.Tip="{l:Tr Tip_Attach}" AutomationProperties.Name="{l:Tr Tip_Attach}">
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/attach.svg" Width="22" Height="22" />
+            </Button>
+            <Border Grid.Column="1" MinHeight="48" CornerRadius="14" Background="{DynamicResource Mg.InsetBrush}" Padding="16,0,6,0">
+              <DockPanel>
+                <Button x:Name="EmojiButton" DockPanel.Dock="Right" Theme="{StaticResource Mg.IconButton}" Width="38" Height="38"
+                        CornerRadius="10" VerticalAlignment="Bottom" Margin="0,0,0,5"
+                        ToolTip.Tip="{l:Tr Tip_Emoji}" AutomationProperties.Name="{l:Tr Tip_Emoji}">
+                  <controls:SvgIcon Source="avares://MeowGram/Assets/icons/emoji.svg" Width="21" Height="21" />
+                </Button>
+                <TextBox x:Name="ComposerBox" Theme="{StaticResource Mg.BareTextBox}" Margin="0,12,4,12"
+                         Text="{Binding ComposerText}" PlaceholderText="{l:Tr Composer_Placeholder}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="180"
+                         AutomationProperties.Name="{l:Tr Composer_Placeholder}" />
+              </DockPanel>
+            </Border>
+            <Panel Grid.Column="2" Margin="8,0,0,0" VerticalAlignment="Bottom">
+              <!-- Пусто: кнопка записи с ушами (запись — следующий этап) -->
+              <Button Theme="{StaticResource Mg.PlainButton}" Width="48" Height="48" CornerRadius="24"
+                      IsVisible="{Binding ComposerAction, Converter={x:Static views:ComposerConverters.IsRecord}}"
+                      ToolTip.Tip="{l:Tr Common_SoonVoice}" AutomationProperties.Name="{l:Tr Tip_Record}">
+                <Panel>
+                  <controls:SvgIcon Source="avares://MeowGram/Assets/icons/ears-mic.svg" Width="48" Height="48"
+                                    Foreground="{DynamicResource Mg.AccentBrush}" />
+                  <controls:SvgIcon Source="avares://MeowGram/Assets/icons/ears-mic-glyph.svg" Width="48" Height="48"
+                                    Foreground="{DynamicResource Mg.OnAccentBrush}" />
+                </Panel>
+              </Button>
+              <Button Theme="{StaticResource Mg.AccentCircleButton}" Command="{Binding SendCommand}"
+                      IsVisible="{Binding ComposerAction, Converter={x:Static views:ComposerConverters.IsSend}}"
+                      ToolTip.Tip="{l:Tr Tip_Send}" AutomationProperties.Name="{l:Tr Tip_Send}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/send.svg" Width="20" Height="20" />
+              </Button>
+              <Button Theme="{StaticResource Mg.AccentCircleButton}" Command="{Binding SendCommand}"
+                      IsVisible="{Binding ComposerAction, Converter={x:Static views:ComposerConverters.IsSave}}"
+                      ToolTip.Tip="{l:Tr Tip_Save}" AutomationProperties.Name="{l:Tr Tip_Save}">
+                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/check-save.svg" Width="20" Height="20" />
+              </Button>
+            </Panel>
+          </Grid>
+        </StackPanel>
+
+        <!-- ── Лента ───────────────────────────────────────────────── -->
+        <Panel>
+          <ScrollViewer x:Name="Feed" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="FeedStack" VerticalAlignment="Bottom" Margin="28,16,28,12" Classes.compact="{Binding IsCompact}">
+              <StackPanel.Styles>
+                <Style Selector="StackPanel.compact">
+                  <Setter Property="Margin" Value="16,12,16,8" />
+                </Style>
+              </StackPanel.Styles>
+              <ItemsControl x:Name="FeedItems" ItemsSource="{Binding Items}">
+                <ItemsControl.DataTemplates>
+
+                  <DataTemplate DataType="feed:DayHeaderViewModel">
+                    <Border Classes="pill" Margin="0,4,0,14">
+                      <TextBlock Text="{Binding Text}" FontWeight="Medium" />
+                    </Border>
+                  </DataTemplate>
+
+                  <DataTemplate DataType="feed:UnreadSeparatorViewModel">
+                    <Border Background="{DynamicResource Mg.BgBrush}" Margin="-28,2,-28,14" Padding="0,6">
+                      <TextBlock Text="{l:Tr Unread_Separator}" HorizontalAlignment="Center" FontSize="12.5" FontWeight="Medium"
+                                 Foreground="{DynamicResource Mg.MetaBrush}" />
+                    </Border>
+                  </DataTemplate>
+
+                  <DataTemplate DataType="feed:ServiceMessageViewModel">
+                    <Border Classes="pill" Margin="40,0,40,14">
+                      <TextBlock Text="{Binding Text}" />
+                    </Border>
+                  </DataTemplate>
+
+                  <!-- Сообщение -->
+                  <DataTemplate DataType="feed:MessageViewModel">
+                    <Grid Classes="msg" Classes.ends="{Binding EndsSeries}" ColumnDefinitions="Auto,*">
+                      <Panel Width="34" Margin="0,0,10,0" VerticalAlignment="Bottom" IsVisible="{Binding HasAvatarColumn}">
+                        <controls:Avatar Size="34" IsVisible="{Binding ShowAvatar}" Initials="{Binding Avatar.Initials, FallbackValue=''}"
+                                         Image="{Binding Avatar.Photo, FallbackValue={x:Null}}"
+                                         Background="{Binding Avatar.Background, FallbackValue={x:Null}}" />
+                      </Panel>
+                      <controls:BubbleRowPanel Grid.Column="1" AlignRight="{Binding IsOutgoing}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Button Theme="{StaticResource Mg.PlainButton}" Classes="retry" Width="26" Height="26" CornerRadius="13"
+                                  VerticalAlignment="Center" Background="{DynamicResource Mg.ErrorBrush}"
+                                  IsVisible="{Binding IsFailed}" ToolTip.Tip="{l:Tr Tip_Retry}"
+                                  AutomationProperties.Name="{l:Tr Tip_Retry}">
+                            <TextBlock Text="!" FontWeight="Bold" FontSize="14" Foreground="#141414"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          </Button>
+                          <Border Classes="bubble" Classes.out="{Binding IsOutgoing}" Classes.media="{Binding IsMedia}"
+                                  Classes.bare="{Binding IsBare}" Classes.hl="{Binding IsHighlighted}"
+                                  CornerRadius="{Binding Corners}" ClipToBounds="True">
+                            <StackPanel>
+                              <TextBlock Classes="name" Text="{Binding SenderName}" FontSize="13.5" FontWeight="SemiBold"
+                                         Margin="0,0,0,1" IsVisible="{Binding ShowSenderName}" TextTrimming="CharacterEllipsis" />
+                              <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,0,0,2" IsVisible="{Binding IsForwarded}">
+                                <controls:SvgIcon Source="avares://MeowGram/Assets/icons/forwarded.svg" Width="14" Height="14"
+                                                  Foreground="{DynamicResource Mg.NameBrush}" />
+                                <TextBlock Classes="name" FontSize="13">
+                                  <Run Text="{l:Tr Message_ForwardedFrom}" />
+                                  <Run Text="{Binding ForwardedFrom}" FontWeight="SemiBold" />
+                                </TextBlock>
+                              </StackPanel>
+                              <Button Theme="{StaticResource Mg.PlainButton}" Classes="replyQuote" Margin="-6,0,-2,5"
+                                      HorizontalContentAlignment="Stretch" IsVisible="{Binding HasReply}">
+                                <Border Classes="quote" Padding="10,6">
+                                  <StackPanel>
+                                    <TextBlock Text="{Binding Reply.Name, FallbackValue=''}" FontSize="13" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Reply.Text, FallbackValue=''}" FontSize="13.5" Opacity="0.85"
+                                               TextTrimming="CharacterEllipsis" />
+                                  </StackPanel>
+                                </Border>
+                              </Button>
+
+                              <ContentControl Content="{Binding Content}">
+                                <ContentControl.DataTemplates>
+
+                                  <!-- Текст -->
+                                  <DataTemplate DataType="feed:TextContentViewModel">
+                                    <StackPanel>
+                                      <controls:InlineMetaPanel>
+                                        <controls:RichMessageText Segments="{Binding Segments}" TextWrapping="Wrap" FontSize="15"
+                                                                  LineHeight="21.75" LinkBrush="{DynamicResource Mg.NameBrush}"
+                                                                  FontStyle="{Binding IsPlaceholder, Converter={x:Static views:ComposerConverters.ItalicIf}}" />
+                                        <Panel IsVisible="{Binding !HasPreview}">
+                                          <views:MessageMeta DataContext="{Binding Owner}" />
+                                        </Panel>
+                                      </controls:InlineMetaPanel>
+                                      <Button Theme="{StaticResource Mg.PlainButton}" Classes="linkPreview" Margin="0,8,0,2"
+                                              HorizontalContentAlignment="Stretch" IsVisible="{Binding HasPreview}" Tag="{Binding PreviewUrl}">
+                                        <Border Classes="quote" Padding="12,9">
+                                          <StackPanel Spacing="2">
+                                            <TextBlock Classes="name" Text="{Binding PreviewSite}" FontSize="12.5" FontWeight="SemiBold"
+                                                       IsVisible="{Binding HasPreviewSite}" />
+                                            <TextBlock Text="{Binding PreviewTitle}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"
+                                                       IsVisible="{Binding HasPreviewTitle}" />
+                                            <TextBlock Text="{Binding PreviewDescription}" FontSize="13.5" Opacity="0.85" TextWrapping="Wrap"
+                                                       MaxLines="4" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasPreviewDescription}" />
+                                          </StackPanel>
+                                        </Border>
+                                      </Button>
+                                      <Panel HorizontalAlignment="Right" IsVisible="{Binding HasPreview}">
+                                        <views:MessageMeta DataContext="{Binding Owner}" />
+                                      </Panel>
+                                    </StackPanel>
+                                  </DataTemplate>
+
+                                  <!-- Фото / видео -->
+                                  <DataTemplate DataType="feed:PhotoContentViewModel">
+                                    <StackPanel>
+                                      <Button Theme="{StaticResource Mg.PlainButton}" Command="{Binding OpenCommand}"
+                                              AutomationProperties.Name="{l:Tr Content_Photo}">
+                                        <Panel Width="{Binding Width}" Height="{Binding Height}">
+                                          <Border CornerRadius="14" Background="{DynamicResource Mg.InsetBrush}" ClipToBounds="True">
+                                            <Panel>
+                                              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/image.svg" Width="28" Height="28"
+                                                                Foreground="{DynamicResource Mg.TextMutedBrush}" />
+                                              <Image Source="{Binding Image}" Stretch="UniformToFill" />
+                                            </Panel>
+                                          </Border>
+                                          <Border Width="48" Height="48" CornerRadius="24" Background="#8C000000"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsVideo}">
+                                            <controls:SvgIcon Source="avares://MeowGram/Assets/icons/paw-play-glyph.svg"
+                                                              Width="40" Height="40" Margin="0,0,0,0" Foreground="#F0F0F0" />
+                                          </Border>
+                                          <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" Padding="8,2"
+                                                  CornerRadius="10" Background="#8C000000" IsVisible="{Binding !HasCaption}">
+                                            <views:MessageMeta DataContext="{Binding Owner}" Foreground="#F0F0F0" />
+                                          </Border>
+                                        </Panel>
+                                      </Button>
+                                      <controls:InlineMetaPanel Margin="10,6,8,3" IsVisible="{Binding HasCaption}">
+                                        <controls:RichMessageText Segments="{Binding Caption.Segments}" TextWrapping="Wrap" FontSize="15"
+                                                                  LineHeight="21.75" LinkBrush="{DynamicResource Mg.NameBrush}" />
+                                        <views:MessageMeta DataContext="{Binding Owner}" />
+                                      </controls:InlineMetaPanel>
+                                    </StackPanel>
+                                  </DataTemplate>
+
+                                  <!-- Файл -->
+                                  <DataTemplate DataType="feed:FileContentViewModel">
+                                    <StackPanel Width="276">
+                                      <Button Theme="{StaticResource Mg.PlainButton}" Command="{Binding OpenCommand}" Margin="-4,2,0,2"
+                                              HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding FileName}">
+                                        <DockPanel>
+                                          <Border DockPanel.Dock="Left" Classes="quote" Width="44" Height="44" CornerRadius="22" Margin="0,0,12,0">
+                                            <Panel>
+                                              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/file.svg" Width="20" Height="20"
+                                                                IsVisible="{Binding !IsDownloading}" />
+                                              <ProgressBar IsIndeterminate="{Binding Progress, Converter={x:Static views:ComposerConverters.IsZero}}"
+                                                           Value="{Binding Progress}" Maximum="1" Width="28" Height="4" MinWidth="0"
+                                                           IsVisible="{Binding IsDownloading}" />
+                                            </Panel>
+                                          </Border>
+                                          <StackPanel VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding FileName}" FontSize="14.5" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                                            <DockPanel>
+                                              <Panel DockPanel.Dock="Right" IsVisible="{Binding !HasCaption}">
+                                                <views:MessageMeta DataContext="{Binding Owner}" />
+                                              </Panel>
+                                              <TextBlock Classes="meta" Text="{Binding Size}" FontSize="12.5" />
+                                            </DockPanel>
+                                          </StackPanel>
+                                        </DockPanel>
+                                      </Button>
+                                      <controls:InlineMetaPanel IsVisible="{Binding HasCaption}" Margin="0,4,0,0">
+                                        <controls:RichMessageText Segments="{Binding Caption.Segments}" TextWrapping="Wrap" FontSize="15"
+                                                                  LineHeight="21.75" LinkBrush="{DynamicResource Mg.NameBrush}" />
+                                        <views:MessageMeta DataContext="{Binding Owner}" />
+                                      </controls:InlineMetaPanel>
+                                    </StackPanel>
+                                  </DataTemplate>
+
+                                  <!-- Голосовое: лапка-кнопка, волна-подушечки, скорость в лапках -->
+                                  <DataTemplate DataType="feed:VoiceContentViewModel">
+                                    <StackPanel Width="274">
+                                      <DockPanel Margin="-2,0,0,0">
+                                        <Button DockPanel.Dock="Left" Theme="{StaticResource Mg.PlainButton}" Width="36" Height="36"
+                                                Margin="0,0,10,0" Command="{Binding PlayPauseCommand}" Classes="paw"
+                                                Classes.out="{Binding Owner.IsOutgoing}"
+                                                AutomationProperties.Name="{l:Tr Tip_PlayVoice}">
+                                          <Button.Styles>
+                                            <Style Selector="Button.paw controls|SvgIcon.pawBody">
+                                              <Setter Property="Foreground" Value="{DynamicResource Mg.AccentBrush}" />
+                                            </Style>
+                                            <Style Selector="Button.paw controls|SvgIcon.pawGlyph">
+                                              <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+                                            </Style>
+                                            <Style Selector="Button.paw.out controls|SvgIcon.pawBody">
+                                              <Setter Property="Foreground" Value="{DynamicResource Mg.OutTextBrush}" />
+                                            </Style>
+                                            <Style Selector="Button.paw.out controls|SvgIcon.pawGlyph">
+                                              <Setter Property="Foreground" Value="{DynamicResource Mg.OutBubbleBrush}" />
+                                            </Style>
+                                          </Button.Styles>
+                                          <Panel>
+                                            <controls:SvgIcon Classes="pawBody" Source="avares://MeowGram/Assets/icons/paw.svg" Width="36" Height="36" />
+                                            <controls:SvgIcon Classes="pawGlyph" Source="avares://MeowGram/Assets/icons/paw-play-glyph.svg"
+                                                              Width="36" Height="36" IsVisible="{Binding !IsPlaying}" />
+                                            <controls:SvgIcon Classes="pawGlyph" Source="avares://MeowGram/Assets/icons/paw-pause-glyph.svg"
+                                                              Width="36" Height="36" IsVisible="{Binding IsPlaying}" />
+                                          </Panel>
+                                        </Button>
+                                        <StackPanel VerticalAlignment="Center" Spacing="5">
+                                          <ItemsControl Classes="beans" Height="26" ItemsSource="{Binding Beans}" Background="Transparent" Cursor="Hand">
+                                            <ItemsControl.ItemsPanel>
+                                              <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                              </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                              <DataTemplate DataType="feed:BeanViewModel">
+                                                <Ellipse Classes="bean" Width="5" Height="{Binding Height}" VerticalAlignment="Center"
+                                                         Margin="{Binding Margin, Converter={x:Static views:ComposerConverters.LeftMargin}}"
+                                                         Opacity="{Binding IsPlayed, Converter={x:Static views:ComposerConverters.PlayedOpacity}}" />
+                                              </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                          </ItemsControl>
+                                          <DockPanel>
+                                            <views:MessageMeta DockPanel.Dock="Right" DataContext="{Binding Owner}" Margin="6,0,0,0" />
+                                            <Button DockPanel.Dock="Right" Theme="{StaticResource Mg.PlainButton}" Command="{Binding CycleSpeedCommand}"
+                                                    AutomationProperties.Name="{l:Tr Tip_Speed}" ToolTip.Tip="{l:Tr Tip_Speed}">
+                                              <Border Classes="quote" Height="20" CornerRadius="10" Padding="7,0">
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                  <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                                                    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/paw.svg" Width="10" Height="10" />
+                                                    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/paw.svg" Width="10" Height="10" IsVisible="{Binding ShowPaw2}" />
+                                                    <controls:SvgIcon Source="avares://MeowGram/Assets/icons/paw.svg" Width="10" Height="10" IsVisible="{Binding ShowPaw3}" />
+                                                  </StackPanel>
+                                                  <TextBlock Classes="meta" Text="{Binding SpeedText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                              </Border>
+                                            </Button>
+                                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                              <TextBlock Classes="meta" Text="{Binding TimeText}" />
+                                              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/paw.svg" Width="10" Height="10"
+                                                                Foreground="{DynamicResource Mg.AccentBrush}" IsVisible="{Binding ShowUnlistened}"
+                                                                AutomationProperties.Name="{l:Tr Voice_Unlistened}" />
+                                            </StackPanel>
+                                          </DockPanel>
+                                        </StackPanel>
+                                      </DockPanel>
+                                      <controls:InlineMetaPanel IsVisible="{Binding HasCaption}" Margin="0,6,0,0">
+                                        <controls:RichMessageText Segments="{Binding Caption.Segments}" TextWrapping="Wrap" FontSize="15" />
+                                        <Panel />
+                                      </controls:InlineMetaPanel>
+                                    </StackPanel>
+                                  </DataTemplate>
+
+                                  <!-- Стикер -->
+                                  <DataTemplate DataType="feed:StickerContentViewModel">
+                                    <Panel Width="160" Height="160">
+                                      <TextBlock Text="{Binding Emoji}" FontSize="72" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                 IsVisible="{Binding Image, Converter={x:Static ObjectConverters.IsNull}}" />
+                                      <Image Source="{Binding Image}" Stretch="Uniform" />
+                                      <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Padding="8,2" CornerRadius="10"
+                                              Background="#8C000000">
+                                        <views:MessageMeta DataContext="{Binding Owner}" Foreground="#F0F0F0" />
+                                      </Border>
+                                    </Panel>
+                                  </DataTemplate>
+                                </ContentControl.DataTemplates>
+                              </ContentControl>
+
+                              <!-- Реакции -->
+                              <ItemsControl ItemsSource="{Binding Reactions}" Margin="0,6,0,2" IsVisible="{Binding HasReactions}">
+                                <ItemsControl.ItemsPanel>
+                                  <ItemsPanelTemplate>
+                                    <WrapPanel ItemSpacing="6" LineSpacing="6" />
+                                  </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                  <DataTemplate DataType="feed:ReactionViewModel">
+                                    <Button Theme="{StaticResource Mg.SurfaceButton}" Classes="reaction" Classes.chosen="{Binding IsChosen}">
+                                      <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <controls:SvgIcon Source="avares://MeowGram/Assets/icons/heart.svg" Width="15" Height="15"
+                                                          IsVisible="{Binding IsHeart}" />
+                                        <TextBlock Text="{Binding Emoji}" FontSize="14" IsVisible="{Binding !IsHeart}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Count}" VerticalAlignment="Center" />
+                                      </StackPanel>
+                                    </Button>
+                                  </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                            </StackPanel>
+                          </Border>
+                        </StackPanel>
+                      </controls:BubbleRowPanel>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.DataTemplates>
+              </ItemsControl>
+
+              <!-- «печатает» (группы) -->
+              <Border Classes="pill" HorizontalAlignment="Left" Margin="44,0,0,0"
+                      IsVisible="{Binding Row.IsTyping}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                    <Ellipse Width="5" Height="5" Fill="{DynamicResource Mg.TextMutedBrush}" />
+                    <Ellipse Width="5" Height="5" Fill="{DynamicResource Mg.TextMutedBrush}" Opacity="0.7" />
+                    <Ellipse Width="5" Height="5" Fill="{DynamicResource Mg.TextMutedBrush}" Opacity="0.4" />
+                  </StackPanel>
+                  <TextBlock Text="{Binding Row.TypingText}" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+
+          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Classes="body secondary" Text="{l:Tr Chat_Loading}"
+                     IsVisible="{Binding IsLoading}" />
+
+          <!-- Кнопка «вниз» со счётчиком -->
+          <Panel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,16" IsVisible="{Binding ShowScrollDown}">
+            <Button Theme="{StaticResource Mg.FilledIconButton}" Width="48" Height="48" CornerRadius="24"
+                    Command="{Binding ScrollDownCommand}" ToolTip.Tip="{l:Tr Tip_ScrollDown}"
+                    AutomationProperties.Name="{l:Tr Tip_ScrollDown}">
+              <Button.Effect>
+                <DropShadowEffect BlurRadius="24" OffsetY="8" Opacity="0.3" Color="Black" />
+              </Button.Effect>
+              <controls:SvgIcon Source="avares://MeowGram/Assets/icons/chevron-down.svg" Width="20" Height="20" />
+            </Button>
+            <controls:Badge Kind="Accent" Text="{Binding UnreadCount}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Margin="0,-6,-8,0" IsVisible="{Binding HasUnreadBadge}" />
+          </Panel>
+        </Panel>
+      </DockPanel>
+    </Border>
+
+    <Border x:Name="Ring" Classes.compact="{Binding IsCompact}" Classes.shown="{Binding ShowRing}" />
+  </Panel>
+</UserControl>

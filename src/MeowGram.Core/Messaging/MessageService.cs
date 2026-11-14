@@ -94,6 +94,34 @@ public sealed class MessageService(ITdExecutor td)
             InputMessageContent = Text(text, clearDraft: true),
         });
 
+    /// <summary>Отправить файл с диска: картинки — фото, остальное — документом.</summary>
+    public Task<TdApi.Message> SendFileAsync(long chatId, string path, long replyToMessageId = 0)
+    {
+        var file = new TdApi.InputFile.InputFileLocal { Path = path };
+        var empty = new TdApi.FormattedText { Text = string.Empty, Entities = [] };
+        TdApi.InputMessageContent content = IsPhoto(path)
+            ? new TdApi.InputMessageContent.InputMessagePhoto
+            {
+                Photo = new TdApi.InputPhoto { Photo = file, AddedStickerFileIds = [] },
+                Caption = empty,
+            }
+            : new TdApi.InputMessageContent.InputMessageDocument
+            {
+                Document = new TdApi.InputDocument { Document = file },
+                Caption = empty,
+            };
+
+        return td.ExecuteAsync(new TdApi.SendMessage
+        {
+            ChatId = chatId,
+            ReplyTo = replyToMessageId == 0 ? null : new TdApi.InputMessageReplyTo.InputMessageReplyToMessage { MessageId = replyToMessageId },
+            InputMessageContent = content,
+        });
+    }
+
+    public static bool IsPhoto(string path) =>
+        Path.GetExtension(path).ToLowerInvariant() is ".jpg" or ".jpeg" or ".png" or ".webp" or ".bmp";
+
     public Task<TdApi.Message> EditTextAsync(long chatId, long messageId, string text) =>
         td.ExecuteAsync(new TdApi.EditMessageText
         {
