@@ -75,6 +75,12 @@ public sealed class AccountManager : IAsyncDisposable
     /// <summary>Сессия приняла параметры TDLib — можно применять прокси.</summary>
     public event EventHandler<TelegramSession>? SessionInitialized;
 
+    /// <summary>Сессия создана и сейчас будет запущена: подписка на её обновления до первого из них.</summary>
+    public event EventHandler<TelegramSession>? SessionCreated;
+
+    /// <summary>Сессия закрыта и удалена.</summary>
+    public event EventHandler<TelegramSession>? SessionRemoved;
+
     /// <summary>Загружает аккаунты, удаляет недовершённые входы, запускает TDLib для вошедших.</summary>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -210,6 +216,7 @@ public sealed class AccountManager : IAsyncDisposable
         session.AuthorizationStateChanged += OnSessionAuthorizationStateChanged;
         session.Initialized += OnSessionInitialized;
         _sessions[accountId] = session;
+        SessionCreated?.Invoke(this, session);
 
         await session.StartAsync(cancellationToken).ConfigureAwait(false);
         return session;
@@ -337,6 +344,7 @@ public sealed class AccountManager : IAsyncDisposable
         {
             await session.DisposeAsync().ConfigureAwait(false);
             _closingIntentionally.TryRemove(session.AccountId, out _);
+            SessionRemoved?.Invoke(this, session);
         }
 
         DeleteAccountFolder(session.AccountId);
@@ -414,10 +422,18 @@ public sealed class AccountManager : IAsyncDisposable
     }
 }
 
-/// <summary>Запускает сохранённые аккаунты вместе с хостом и закрывает TDLib при выходе.</summary>
-internal sealed class AccountManagerHostedService(AccountManager accounts) : Microsoft.Extensions.Hosting.IHostedService
+/// <summary>
+/// Запускает сохранённые аккаунты вместе с хостом и закрывает TDLib при выходе.
+/// <see cref="Messaging.MessagingHub"/> в зависимостях — чтобы он был создан и подписан на сессии до их запуска.
+/// </summary>
+internal sealed class AccountManagerHostedService(AccountManager accounts, Messaging.MessagingHub hub) : Microsoft.Extensions.Hosting.IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken) => accounts.InitializeAsync(cancellationToken);
 
-    public async Task StopAsync(CancellationToken cancellationToken) => await accounts.DisposeAsync().ConfigureAwait(false);
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        // Сначала отписываем контексты чатов, затем закрываем сессии: обновления закрытия им уже не нужны.
+        hub.Dispose();
+        await accounts.DisposeAsync().ConfigureAwait(false);
+    }
 }

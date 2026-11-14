@@ -1,11 +1,13 @@
 using MeowGram.Core.Accounts;
 using MeowGram.Core.Data;
+using MeowGram.Core.Messaging;
 using MeowGram.Core.Proxies;
 using MeowGram.Core.Security;
 using MeowGram.Core.Settings;
 using MeowGram.Core.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace MeowGram.Core;
 
@@ -28,6 +30,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISettingsStore, SettingsStore>();
         services.AddSingleton<AccountManager>();
         services.AddSingleton<ProxyService>();
+
+        // Поток состояния чатов: приложение подменяет на UI-поток, без UI — выполнение на месте.
+        services.TryAddSingleton<IMainThread>(ImmediateMainThread.Instance);
+        services.AddSingleton<MessagingHub>();
 
         // Порядок важен: сначала миграции БД, затем запуск аккаунтов.
         services.AddHostedService<DatabaseInitializer>();

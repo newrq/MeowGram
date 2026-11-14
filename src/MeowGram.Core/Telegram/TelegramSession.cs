@@ -11,7 +11,7 @@ namespace MeowGram.Core.Telegram;
 /// Один аккаунт = один <see cref="TdClient"/> со своей зашифрованной базой.
 /// Сам отправляет параметры TDLib и раздаёт обновления; запросы — через <see cref="Client"/>.
 /// </summary>
-public sealed class TelegramSession : IAsyncDisposable
+public sealed class TelegramSession : IAsyncDisposable, Messaging.ITdExecutor
 {
     private static readonly Lock LogGate = new();
     private static bool _logConfigured;
@@ -81,6 +81,9 @@ public sealed class TelegramSession : IAsyncDisposable
             .ConfigureAwait(false);
         HandleAuthorizationState(state);
     }
+
+    /// <summary>Запрос к TDLib. Ошибки приходят как <see cref="TdException"/>.</summary>
+    public Task<T> ExecuteAsync<T>(TdApi.Function<T> function) where T : TdApi.Object => Client.ExecuteAsync(function);
 
     /// <summary>Выход из аккаунта на сервере. TDLib перейдёт в LoggingOut → Closed.</summary>
     public async Task LogOutAsync(TimeSpan timeout)
