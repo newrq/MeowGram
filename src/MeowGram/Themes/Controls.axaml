@@ -256,4 +256,61 @@
       <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
     </Style>
   </ControlTheme>
+
+  <!-- Аватарка: инициалы — Onest, точка «в сети» — Mg.Online. Фон и цвет инициалов задаются при использовании. -->
+  <ControlTheme x:Key="{x:Type controls:Avatar}" TargetType="controls:Avatar">
+    <Setter Property="FontFamily" Value="{DynamicResource Mg.BodyFont}" />
+    <Setter Property="OnlineBrush" Value="{DynamicResource Mg.OnlineBrush}" />
+  </ControlTheme>
+
+  <!--
+    Счётчик непрочитанных (макет списка чатов): пилюля 22, скругление 11, Onest 12 SemiBold, по бокам 7.
+    Kind: Accent — акцент, Muted — чат без звука, Mention — кружок «@». Класс small — счётчик на папке рейла.
+  -->
+  <ControlTheme x:Key="{x:Type controls:Badge}" TargetType="controls:Badge">
+    <Setter Property="MinWidth" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="Padding" Value="7,0" />
+    <Setter Property="CornerRadius" Value="11" />
+    <Setter Property="FontFamily" Value="{DynamicResource Mg.BodyFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Background" Value="{DynamicResource Mg.AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.OnAccentBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <TextBlock Text="{TemplateBinding Text}"
+                     Foreground="{TemplateBinding Foreground}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^[Kind=Muted]">
+      <Setter Property="Background" Value="{DynamicResource Mg.LineBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+    <Style Selector="^[Kind=Mention]">
+      <Setter Property="Text" Value="@" />
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="^.small">
+      <Setter Property="MinWidth" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="Padding" Value="5,0" />
+      <Setter Property="CornerRadius" Value="9" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style Selector="^.small[Kind=Mention]">
+      <Setter Property="Width" Value="18" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+  </ControlTheme>
 </ResourceDictionary>

@@ -5,6 +5,8 @@
   Кисти объявлены внутри каждой темы, чтобы работали и внутри ThemeVariantScope (превью темы в панели).
   По умолчанию акцент монохромный (свой в каждой теме); цветной акцент ThemeService
   ставит поверх (Mg.Accent*Brush, Mg.OnAccentBrush, Mg.SelectionBrush).
+  Исходящий пузырь всегда в цвет акцента: здесь Mg.Out*Brush и Mg.NameBrush для монохромного акцента,
+  для цветного их тоже задаёт ThemeService (значения из макета главного окна).
 -->
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -28,6 +30,18 @@
       <Color x:Key="Mg.Success">#7FD6AE</Color>
       <Color x:Key="Mg.Shadow">#80000000</Color>
 
+      <!-- Список чатов и сообщения (макет главного окна). -->
+      <Color x:Key="Mg.Meta">#A3A3A3</Color>  <!-- время, служебные подписи, плейсхолдеры поиска -->
+      <Color x:Key="Mg.InBubble">#434343</Color>  <!-- входящий пузырь -->
+      <Color x:Key="Mg.InText">#D1D1D1</Color>
+      <Color x:Key="Mg.InMeta">#B0B0B0</Color>  <!-- время и подписи во входящем -->
+      <Color x:Key="Mg.InQuote">#38000000</Color>  <!-- цитата и плашки во входящем: чёрный 22% -->
+      <Color x:Key="Mg.Online">#7FD6AE</Color>  <!-- «в сети», точка на аватарке -->
+      <!-- Исходящий пузырь при монохромном акценте (цветной задаёт ThemeService). -->
+      <Color x:Key="Mg.OutMeta">#4A4A4A</Color>
+      <Color x:Key="Mg.OutQuote">#17000000</Color>  <!-- чёрный 9% -->
+      <Color x:Key="Mg.Name">#E0E0E0</Color>  <!-- имена отправителей, заголовки цитат и ответов -->
+
       <SolidColorBrush x:Key="Mg.BgBrush" Color="{StaticResource Mg.Bg}" />
       <SolidColorBrush x:Key="Mg.SurfaceBrush" Color="{StaticResource Mg.Surface}" />
       <SolidColorBrush x:Key="Mg.InsetBrush" Color="{StaticResource Mg.Inset}" />
@@ -43,6 +57,17 @@
       <SolidColorBrush x:Key="Mg.ErrorBrush" Color="{StaticResource Mg.Error}" />
       <SolidColorBrush x:Key="Mg.SuccessBrush" Color="{StaticResource Mg.Success}" />
       <SolidColorBrush x:Key="Mg.ChromeCloseHoverBrush" Color="#C42B1C" />
+      <SolidColorBrush x:Key="Mg.MetaBrush" Color="{StaticResource Mg.Meta}" />
+      <SolidColorBrush x:Key="Mg.InBubbleBrush" Color="{StaticResource Mg.InBubble}" />
+      <SolidColorBrush x:Key="Mg.InTextBrush" Color="{StaticResource Mg.InText}" />
+      <SolidColorBrush x:Key="Mg.InMetaBrush" Color="{StaticResource Mg.InMeta}" />
+      <SolidColorBrush x:Key="Mg.InQuoteBrush" Color="{StaticResource Mg.InQuote}" />
+      <SolidColorBrush x:Key="Mg.OnlineBrush" Color="{StaticResource Mg.Online}" />
+      <SolidColorBrush x:Key="Mg.OutBubbleBrush" Color="{StaticResource Mg.Accent}" />
+      <SolidColorBrush x:Key="Mg.OutTextBrush" Color="{StaticResource Mg.OnAccent}" />
+      <SolidColorBrush x:Key="Mg.OutMetaBrush" Color="{StaticResource Mg.OutMeta}" />
+      <SolidColorBrush x:Key="Mg.OutQuoteBrush" Color="{StaticResource Mg.OutQuote}" />
+      <SolidColorBrush x:Key="Mg.NameBrush" Color="{StaticResource Mg.Name}" />
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Light">
@@ -62,6 +87,16 @@
       <Color x:Key="Mg.Success">#1E7A55</Color>
       <Color x:Key="Mg.Shadow">#26000000</Color>
 
+      <Color x:Key="Mg.Meta">#666666</Color>
+      <Color x:Key="Mg.InBubble">#EDEDED</Color>
+      <Color x:Key="Mg.InText">#141414</Color>
+      <Color x:Key="Mg.InMeta">#5E5E5E</Color>
+      <Color x:Key="Mg.InQuote">#0F000000</Color>  <!-- чёрный 6% -->
+      <Color x:Key="Mg.Online">#1E7A55</Color>
+      <Color x:Key="Mg.OutMeta">#BDBDBD</Color>
+      <Color x:Key="Mg.OutQuote">#1FFFFFFF</Color>  <!-- белый 12% -->
+      <Color x:Key="Mg.Name">#141414</Color>
+
       <SolidColorBrush x:Key="Mg.BgBrush" Color="{StaticResource Mg.Bg}" />
       <SolidColorBrush x:Key="Mg.SurfaceBrush" Color="{StaticResource Mg.Surface}" />
       <SolidColorBrush x:Key="Mg.InsetBrush" Color="{StaticResource Mg.Inset}" />
@@ -77,6 +112,17 @@
       <SolidColorBrush x:Key="Mg.ErrorBrush" Color="{StaticResource Mg.Error}" />
       <SolidColorBrush x:Key="Mg.SuccessBrush" Color="{StaticResource Mg.Success}" />
       <SolidColorBrush x:Key="Mg.ChromeCloseHoverBrush" Color="#C42B1C" />
+      <SolidColorBrush x:Key="Mg.MetaBrush" Color="{StaticResource Mg.Meta}" />
+      <SolidColorBrush x:Key="Mg.InBubbleBrush" Color="{StaticResource Mg.InBubble}" />
+      <SolidColorBrush x:Key="Mg.InTextBrush" Color="{StaticResource Mg.InText}" />
+      <SolidColorBrush x:Key="Mg.InMetaBrush" Color="{StaticResource Mg.InMeta}" />
+      <SolidColorBrush x:Key="Mg.InQuoteBrush" Color="{StaticResource Mg.InQuote}" />
+      <SolidColorBrush x:Key="Mg.OnlineBrush" Color="{StaticResource Mg.Online}" />
+      <SolidColorBrush x:Key="Mg.OutBubbleBrush" Color="{StaticResource Mg.Accent}" />
+      <SolidColorBrush x:Key="Mg.OutTextBrush" Color="{StaticResource Mg.OnAccent}" />
+      <SolidColorBrush x:Key="Mg.OutMetaBrush" Color="{StaticResource Mg.OutMeta}" />
+      <SolidColorBrush x:Key="Mg.OutQuoteBrush" Color="{StaticResource Mg.OutQuote}" />
+      <SolidColorBrush x:Key="Mg.NameBrush" Color="{StaticResource Mg.Name}" />
     </ResourceDictionary>
 
   </ResourceDictionary.ThemeDictionaries>
