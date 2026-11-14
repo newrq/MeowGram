@@ -106,6 +106,7 @@ public sealed class GlyphLayer : Control
     private readonly Tween _caretX = new();
     private readonly FrameClock _clock;
     private readonly DispatcherTimer _blink;
+    private readonly BrushWatcher _brushes;
     private MeowTextBox? _box;
     private TextPresenter? _presenter;
     private string _text = string.Empty;
@@ -117,6 +118,7 @@ public sealed class GlyphLayer : Control
 
     public GlyphLayer()
     {
+        _brushes = new BrushWatcher(this);
         IsHitTestVisible = false;
         _clock = new FrameClock(this, IsAnimating);
         _blink = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(530) };
@@ -304,9 +306,16 @@ public sealed class GlyphLayer : Control
             context.DrawText(text, topLeft);
     }
 
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _brushes.Clear();
+    }
+
     private void EnsureCache()
     {
-        var key = (_box!.Foreground, _box.FontSize, new Typeface(_box.FontFamily, _box.FontStyle, _box.FontWeight));
+        _brushes.Watch(_box!.Foreground);
+        var key = (_box.Foreground, _box.FontSize, new Typeface(_box.FontFamily, _box.FontStyle, _box.FontWeight));
         if (key == _cacheKey)
             return;
 

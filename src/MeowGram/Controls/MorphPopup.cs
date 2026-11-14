@@ -43,6 +43,12 @@ public sealed class MorphPopup : Decorator
     private double _radius;
     private double _openValue;
 
+    static MorphPopup()
+    {
+        // Перерисовка и при смене цвета той же кисти (перетекание тем меняет цвет, не подменяя кисть).
+        AffectsRender<MorphPopup>(BackgroundProperty);
+    }
+
     public MorphPopup()
     {
         ClipToBounds = false;

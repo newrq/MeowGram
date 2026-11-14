@@ -100,21 +100,12 @@
   <data name="Proxy_SecretRequired" xml:space="preserve"><value>MTProto needs a secret</value></data>
   <data name="Proxy_NeedSession" xml:space="preserve"><value>Checking works while MeowGram is connecting to Telegram</value></data>
   <data name="Theme_Mode" xml:space="preserve"><value>Appearance</value></data>
-  <data name="Theme_Dark" xml:space="preserve"><value>Dark</value></data>
-  <data name="Theme_Light" xml:space="preserve"><value>Light</value></data>
-  <data name="Theme_System" xml:space="preserve"><value>System</value></data>
   <data name="Theme_Accent" xml:space="preserve"><value>Accent</value></data>
   <data name="Theme_Animations" xml:space="preserve"><value>Animations</value></data>
-  <data name="Animations_Full" xml:space="preserve"><value>Full</value></data>
-  <data name="Animations_Reduced" xml:space="preserve"><value>Reduced</value></data>
-  <data name="Animations_Off" xml:space="preserve"><value>Off</value></data>
-  <data name="Accent_mono" xml:space="preserve"><value>Monochrome</value></data>
-  <data name="Accent_lavender" xml:space="preserve"><value>Lavender</value></data>
-  <data name="Accent_lilac" xml:space="preserve"><value>Lilac</value></data>
-  <data name="Accent_ocean" xml:space="preserve"><value>Ocean</value></data>
-  <data name="Accent_mint" xml:space="preserve"><value>Mint</value></data>
-  <data name="Accent_rose" xml:space="preserve"><value>Rose</value></data>
-  <data name="Accent_amber" xml:space="preserve"><value>Amber</value></data>
+  <data name="Accent_mono" xml:space="preserve"><value>Default</value></data>
+  <data name="Accent_pink" xml:space="preserve"><value>Pink</value></data>
+  <data name="Accent_violet" xml:space="preserve"><value>Violet</value></data>
+  <data name="Accent_violetGradient" xml:space="preserve"><value>Violet gradient</value></data>
   <data name="Accounts_Hint" xml:space="preserve"><value>Accounts you are signed in to. Click to switch back</value></data>
   <data name="Home_Title" xml:space="preserve"><value>You're signed in</value></data>
   <data name="Home_Subtitle" xml:space="preserve"><value>Chats are coming here soon</value></data>

@@ -100,21 +100,12 @@
   <data name="Proxy_SecretRequired" xml:space="preserve"><value>Для MTProto нужен секрет</value></data>
   <data name="Proxy_NeedSession" xml:space="preserve"><value>Проверка доступна, когда MeowGram подключается к Telegram</value></data>
   <data name="Theme_Mode" xml:space="preserve"><value>Оформление</value></data>
-  <data name="Theme_Dark" xml:space="preserve"><value>Тёмная</value></data>
-  <data name="Theme_Light" xml:space="preserve"><value>Светлая</value></data>
-  <data name="Theme_System" xml:space="preserve"><value>Как в системе</value></data>
   <data name="Theme_Accent" xml:space="preserve"><value>Акцент</value></data>
   <data name="Theme_Animations" xml:space="preserve"><value>Анимации</value></data>
-  <data name="Animations_Full" xml:space="preserve"><value>Полные</value></data>
-  <data name="Animations_Reduced" xml:space="preserve"><value>Меньше</value></data>
-  <data name="Animations_Off" xml:space="preserve"><value>Выкл.</value></data>
-  <data name="Accent_mono" xml:space="preserve"><value>Монохром</value></data>
-  <data name="Accent_lavender" xml:space="preserve"><value>Лаванда</value></data>
-  <data name="Accent_lilac" xml:space="preserve"><value>Сирень</value></data>
-  <data name="Accent_ocean" xml:space="preserve"><value>Океан</value></data>
-  <data name="Accent_mint" xml:space="preserve"><value>Мята</value></data>
-  <data name="Accent_rose" xml:space="preserve"><value>Роза</value></data>
-  <data name="Accent_amber" xml:space="preserve"><value>Янтарь</value></data>
+  <data name="Accent_mono" xml:space="preserve"><value>Обычный</value></data>
+  <data name="Accent_pink" xml:space="preserve"><value>Розовый</value></data>
+  <data name="Accent_violet" xml:space="preserve"><value>Фиолетовый</value></data>
+  <data name="Accent_violetGradient" xml:space="preserve"><value>Фиолетовый градиент</value></data>
   <data name="Accounts_Hint" xml:space="preserve"><value>Аккаунты, в которые вы уже вошли. Нажмите, чтобы вернуться</value></data>
   <data name="Home_Title" xml:space="preserve"><value>Вы вошли</value></data>
   <data name="Home_Subtitle" xml:space="preserve"><value>Здесь скоро будут чаты</value></data>

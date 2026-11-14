@@ -343,18 +343,24 @@
             <StackPanel Spacing="10">
               <TextBlock Classes="panelTitle" Text="{l:Tr Panel_Theme}" />
               <TextBlock Classes="label" Text="{l:Tr Theme_Mode}" />
-              <Border Classes="segments">
-                <UniformGrid Columns="3">
-                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="themeMode" IsChecked="{Binding IsDark}" Content="{l:Tr Theme_Dark}" />
-                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="themeMode" IsChecked="{Binding IsLight}" Content="{l:Tr Theme_Light}" />
-                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="themeMode" IsChecked="{Binding IsSystem}" Content="{l:Tr Theme_System}" />
-                </UniformGrid>
-              </Border>
+              <!-- Слева тёмная, справа светлая; пока бегунок движется, цвета приложения перетекают (ThemeProgress). -->
+              <controls:SlideSwitch Theme="{StaticResource Mg.ThemeSlider}"
+                                    IsChecked="{Binding IsLight}"
+                                    Progress="{Binding ThemeProgress, Mode=OneWayToSource}"
+                                    IsInteracting="{Binding IsThemeInteracting, Mode=OneWayToSource}"
+                                    AutomationProperties.Name="{l:Tr Theme_Mode}">
+                <controls:SlideSwitch.OffContent>
+                  <controls:SvgIcon Source="avares://MeowGram/Assets/icons/moon.svg" Width="18" Height="18" />
+                </controls:SlideSwitch.OffContent>
+                <controls:SlideSwitch.OnContent>
+                  <controls:SvgIcon Source="avares://MeowGram/Assets/icons/sun.svg" Width="18" Height="18" />
+                </controls:SlideSwitch.OnContent>
+              </controls:SlideSwitch>
               <TextBlock Classes="label" Margin="0,6,0,0" Text="{l:Tr Theme_Accent}" />
               <ItemsControl ItemsSource="{Binding Accents}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
-                    <WrapPanel ItemSpacing="6" LineSpacing="6" />
+                    <StackPanel Orientation="Horizontal" Spacing="10" />
                   </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -377,14 +383,12 @@
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-              <TextBlock Classes="label" Margin="0,6,0,0" Text="{l:Tr Theme_Animations}" />
-              <Border Classes="segments">
-                <UniformGrid Columns="3">
-                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="animations" IsChecked="{Binding IsFull}" Content="{l:Tr Animations_Full}" />
-                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="animations" IsChecked="{Binding IsReduced}" Content="{l:Tr Animations_Reduced}" />
-                  <RadioButton Theme="{StaticResource Mg.Segment}" GroupName="animations" IsChecked="{Binding IsOff}" Content="{l:Tr Animations_Off}" />
-                </UniformGrid>
-              </Border>
+              <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                <TextBlock Classes="label" VerticalAlignment="Center" Text="{l:Tr Theme_Animations}" />
+                <controls:SlideSwitch Grid.Column="1" Theme="{StaticResource Mg.Toggle}"
+                                      IsChecked="{Binding AnimationsEnabled}"
+                                      AutomationProperties.Name="{l:Tr Theme_Animations}" />
+              </Grid>
             </StackPanel>
           </DataTemplate>
 
@@ -495,19 +499,19 @@
               Classes.active="{Binding Panels.IsLanguageActive}"
               Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Language}"
               ToolTip.Tip="{l:Tr Panel_Language}" AutomationProperties.Name="{l:Tr Panel_Language}">
-        <controls:StrokeIcon Data="{StaticResource Icon.Globe}" />
+        <controls:SvgIcon Source="avares://MeowGram/Assets/icons/language-switch-icon.svg" Width="18" Height="18" />
       </Button>
       <Button Theme="{StaticResource Mg.RoundButton}" Tag="1" Click="OnPanelButtonClick"
               Classes.active="{Binding Panels.IsProxyActive}"
               Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Proxy}"
               ToolTip.Tip="{l:Tr Panel_Proxy}" AutomationProperties.Name="{l:Tr Panel_Proxy}">
-        <controls:StrokeIcon Data="{StaticResource Icon.Shield}" />
+        <controls:SvgIcon Source="avares://MeowGram/Assets/icons/shield-icon.svg" Width="18" Height="18" />
       </Button>
       <Button Theme="{StaticResource Mg.RoundButton}" Tag="2" Click="OnPanelButtonClick"
               Classes.active="{Binding Panels.IsThemeActive}"
               Command="{Binding Panels.ToggleCommand}" CommandParameter="{x:Static vm:LoginPanel.Theme}"
               ToolTip.Tip="{l:Tr Panel_Theme}" AutomationProperties.Name="{l:Tr Panel_Theme}">
-        <controls:StrokeIcon Data="{StaticResource Icon.Palette}" />
+        <controls:SvgIcon Source="avares://MeowGram/Assets/icons/theme-icon.svg" Width="18" Height="18" />
       </Button>
       <Button Theme="{StaticResource Mg.RoundButton}" Tag="3" Click="OnPanelButtonClick"
               IsVisible="{Binding Panels.HasAccounts}"

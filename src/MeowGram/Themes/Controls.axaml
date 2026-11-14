@@ -5,7 +5,8 @@
   Наведение — плавная смена фона, нажатие — сжатие до 97%.
 -->
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:MeowGram.Controls">
 
   <ControlTheme x:Key="Mg.ButtonBase" TargetType="Button">
     <Setter Property="Cursor" Value="Hand" />
@@ -174,11 +175,14 @@
     </Style>
   </ControlTheme>
 
+  <!-- Кружок акцента: содержимое (Ellipse) растягивается на всю кнопку за вычетом рамки и отступа. -->
   <ControlTheme x:Key="Mg.Swatch" TargetType="Button" BasedOn="{StaticResource Mg.ButtonBase}">
     <Setter Property="Width" Value="32" />
     <Setter Property="Height" Value="32" />
     <Setter Property="Padding" Value="3" />
     <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="2" />
@@ -186,6 +190,69 @@
       <Setter Property="BorderBrush" Value="{DynamicResource Mg.LineBrush}" />
     </Style>
     <Style Selector="^.selected /template/ Border#PART_Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+  </ControlTheme>
+
+
+  <!--
+    Переключатели с бегунком (controls:SlideSwitch). Положение бегунка, яркость краёв и слой «включено»
+    задаёт сам контрол по ходу движения; здесь — только формы и цвета.
+    Mg.ThemeSlider — широкая пилюля режима темы: дорожка как у сегментов, иконки краёв поверх бегунка.
+    Mg.Toggle — маленький тумблер вкл/выкл: включённая дорожка — цвет акцента.
+  -->
+
+  <ControlTheme x:Key="Mg.ThemeSlider" TargetType="controls:SlideSwitch">
+    <Setter Property="Height" Value="44" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Mg.TextBrush}" />
+    <Setter Property="InactiveOpacity" Value="0.45" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Background="{TemplateBinding Background}" CornerRadius="22" />
+          <Border x:Name="PART_Thumb" Width="36" Height="36" Margin="4" CornerRadius="18"
+                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                  Background="{DynamicResource Mg.SurfaceBrush}" BoxShadow="0 1 3 0 #40000000" />
+          <ContentPresenter x:Name="PART_OffContent" Width="36" Height="36" Margin="4"
+                            HorizontalAlignment="Left" VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Foreground="{TemplateBinding Foreground}" Content="{TemplateBinding OffContent}"
+                            IsHitTestVisible="False" />
+          <ContentPresenter x:Name="PART_OnContent" Width="36" Height="36" Margin="4"
+                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Foreground="{TemplateBinding Foreground}" Content="{TemplateBinding OnContent}"
+                            IsHitTestVisible="False" />
+          <Border x:Name="Ring" CornerRadius="22" BorderThickness="2" BorderBrush="Transparent" IsHitTestVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
+      <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="Mg.Toggle" TargetType="controls:SlideSwitch">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Height" Value="26" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background" Value="{DynamicResource Mg.InsetBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Background="{TemplateBinding Background}" CornerRadius="13" />
+          <Border x:Name="PART_OnLayer" Background="{DynamicResource Mg.AccentBrush}" CornerRadius="13" Opacity="0" />
+          <Border x:Name="PART_Thumb" Width="20" Height="20" Margin="3" CornerRadius="10"
+                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                  Background="{DynamicResource Mg.SurfaceBrush}" BoxShadow="0 1 2 0 #40000000" />
+          <Border x:Name="Ring" CornerRadius="13" BorderThickness="2" BorderBrush="Transparent" IsHitTestVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-visible /template/ Border#Ring">
       <Setter Property="BorderBrush" Value="{DynamicResource Mg.TextBrush}" />
     </Style>
   </ControlTheme>

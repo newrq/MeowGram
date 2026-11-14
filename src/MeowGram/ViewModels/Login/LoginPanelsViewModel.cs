@@ -121,6 +121,7 @@ public sealed partial class LanguageOption(string code, string title) : Observab
 public sealed partial class ThemePanelModel : ObservableObject
 {
     private readonly ThemeService _theme;
+    private bool _themeInteracting;
 
     public ThemePanelModel(ThemeService theme)
     {
@@ -128,12 +129,8 @@ public sealed partial class ThemePanelModel : ObservableObject
         Accents = AccentPreset.All.Select(a => new AccentOption(a, this)).ToArray();
         _theme.Changed += (_, _) =>
         {
-            OnPropertyChanged(nameof(IsDark));
             OnPropertyChanged(nameof(IsLight));
-            OnPropertyChanged(nameof(IsSystem));
-            OnPropertyChanged(nameof(IsFull));
-            OnPropertyChanged(nameof(IsReduced));
-            OnPropertyChanged(nameof(IsOff));
+            OnPropertyChanged(nameof(AnimationsEnabled));
             foreach (var accent in Accents)
                 accent.Refresh();
         };
@@ -143,40 +140,51 @@ public sealed partial class ThemePanelModel : ObservableObject
 
     public AccentPreset CurrentAccent => _theme.Accent;
 
-    public bool IsDark
-    {
-        get => _theme.Mode == ThemeMode.Dark;
-        set { if (value) _ = _theme.SetModeAsync(ThemeMode.Dark); }
-    }
-
+    /// <summary>Ползунок темы справа — светлая. Меняется, когда бегунок доехал до края.</summary>
     public bool IsLight
     {
         get => _theme.Mode == ThemeMode.Light;
-        set { if (value) _ = _theme.SetModeAsync(ThemeMode.Light); }
+        set
+        {
+            if (value != IsLight)
+                _ = _theme.SetModeAsync(value ? ThemeMode.Light : ThemeMode.Dark);
+        }
     }
 
-    public bool IsSystem
+    /// <summary>
+    /// Положение бегунка темы (0 — тёмная, 1 — светлая), только из контрола в модель: пока бегунок в движении,
+    /// цвета приложения смешиваются. При выключенных анимациях не смешиваются — тема сменится в конце, сразу.
+    /// </summary>
+    public double ThemeProgress
     {
-        get => _theme.Mode == ThemeMode.System;
-        set { if (value) _ = _theme.SetModeAsync(ThemeMode.System); }
+        get => IsLight ? 1 : 0;
+        set
+        {
+            if (_themeInteracting && !Motion.IsOff)
+                _theme.PreviewBlend(value);
+        }
     }
 
-    public bool IsFull
+    /// <summary>Бегунок темы нажат/тянется/доезжает. По окончании смешанные цвета убираются (тема уже применена).</summary>
+    public bool IsThemeInteracting
+    {
+        get => _themeInteracting;
+        set
+        {
+            _themeInteracting = value;
+            if (!value)
+                _theme.EndPreview();
+        }
+    }
+
+    public bool AnimationsEnabled
     {
         get => _theme.Animations == AnimationLevel.Full;
-        set { if (value) _ = _theme.SetAnimationsAsync(AnimationLevel.Full); }
-    }
-
-    public bool IsReduced
-    {
-        get => _theme.Animations == AnimationLevel.Reduced;
-        set { if (value) _ = _theme.SetAnimationsAsync(AnimationLevel.Reduced); }
-    }
-
-    public bool IsOff
-    {
-        get => _theme.Animations == AnimationLevel.Off;
-        set { if (value) _ = _theme.SetAnimationsAsync(AnimationLevel.Off); }
+        set
+        {
+            if (value != AnimationsEnabled)
+                _ = _theme.SetAnimationsAsync(value ? AnimationLevel.Full : AnimationLevel.Off);
+        }
     }
 
     internal void SelectAccent(AccentPreset accent) => _ = _theme.SetAccentAsync(accent);
@@ -186,8 +194,8 @@ public sealed partial class AccentOption(AccentPreset preset, ThemePanelModel ow
 {
     public AccentPreset Preset { get; } = preset;
 
-    /// <summary>Цвет кружка; у монохрома кружок рисуется двухцветным.</summary>
-    public Avalonia.Media.IBrush Brush { get; } = new Avalonia.Media.SolidColorBrush(preset.Color ?? Avalonia.Media.Color.Parse("#D1D1D1"));
+    /// <summary>Заливка кружка (цвет или градиент); у монохрома кружок рисуется двухцветным в разметке.</summary>
+    public Avalonia.Media.IBrush? Brush { get; } = preset.IsMono ? null : preset.CreateBrush();
 
     public bool IsMono => Preset.IsMono;
 

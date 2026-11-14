@@ -156,12 +156,14 @@ public sealed class CodeCellsLayer : Control
     private readonly Dictionary<char, FormattedText> _cache = [];
     private readonly Random _random = new();
     private readonly FrameClock _clock;
+    private readonly BrushWatcher _brushes;
     private CodeInput? _input;
     private string _text = string.Empty;
     private (IBrush? Brush, double Size, Typeface Face) _cacheKey;
 
     public CodeCellsLayer()
     {
+        _brushes = new BrushWatcher(this);
         IsHitTestVisible = false;
         _clock = new FrameClock(this, () =>
         {
@@ -263,9 +265,16 @@ public sealed class CodeCellsLayer : Control
             context.DrawText(text, topLeft);
     }
 
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _brushes.Clear();
+    }
+
     private void EnsureCache()
     {
-        var key = (_input!.Foreground, _input.FontSize, new Typeface(_input.FontFamily, _input.FontStyle, _input.FontWeight));
+        _brushes.Watch(_input!.Foreground, _input.Background, _input.BorderBrush);
+        var key = (_input.Foreground, _input.FontSize, new Typeface(_input.FontFamily, _input.FontStyle, _input.FontWeight));
         if (key == _cacheKey)
             return;
 
