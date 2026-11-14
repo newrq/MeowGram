@@ -153,6 +153,12 @@ public sealed class CodeCellsLayer : Control
 {
     private readonly List<(char Digit, TimeSpan BornAt, double Tilt)> _digits = [];
     private readonly List<(char Digit, int Cell, TimeSpan DiedAt)> _dying = [];
+    /// <summary>
+    /// Ровные (lining) цифры: у Playfair Display по умолчанию старостильные — 2 ростом со строчную букву, 3/4/5/7/9 уходят ниже строки.
+    /// С lnum все цифры высотой с прописную и стоят на одной линии.
+    /// </summary>
+    private static readonly FontFeatureCollection LiningFigures = [FontFeature.Parse("lnum")];
+
     private readonly Dictionary<char, (FormattedText Text, Rect Ink)> _cache = [];
     private readonly Random _random = new();
     private readonly FrameClock _clock;
@@ -284,8 +290,8 @@ public sealed class CodeCellsLayer : Control
     }
 
     /// <summary>
-    /// Текст цифры и рамка её контура (относительно точки вывода текста). У Playfair Display над цифрами большой запас строки,
-    /// а цифры старостильные (3, 5 уходят ниже строки) — центрирование по высоте строки сажало их ниже центра ячейки.
+    /// Текст цифры и рамка её контура (относительно точки вывода текста). У Playfair Display над цифрами большой запас строки —
+    /// центрирование по высоте строки сажало цифры ниже центра ячейки, поэтому по центру ставится контур.
     /// </summary>
     private (FormattedText Text, Rect Ink) GetGlyph(char digit)
     {
@@ -293,6 +299,7 @@ public sealed class CodeCellsLayer : Control
         {
             var text = new FormattedText(digit.ToString(), System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
                 _cacheKey.Face, _cacheKey.Size, _cacheKey.Brush ?? Brushes.White);
+            text.SetFontFeatures(LiningFigures);
             var ink = text.BuildGeometry(default)?.Bounds ?? default;
             if (ink.Width <= 0 || ink.Height <= 0)
                 ink = new Rect(0, 0, text.Width, text.Height);
