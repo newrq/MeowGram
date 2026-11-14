@@ -81,12 +81,16 @@ public sealed partial class AttachmentViewModel : ObservableObject
 /// Инфо-панель активного окна: профиль собеседника (имя пользователя, о себе, уведомления) или группа
 /// (описание, участники), кнопки быстрых действий и вкладки вложений.
 /// </summary>
-public sealed partial class InfoPanelViewModel : ObservableObject
+public sealed partial class InfoPanelViewModel : ObservableObject, IDisposable
 {
     private readonly MessagingContext _context;
     private readonly Action<long> _jumpTo;
     private readonly Action _searchInChat;
+
+    // Файлы вкладки подписаны на ход загрузки в FileService — отписываем при смене вкладки и закрытии панели.
+    private readonly List<FileContentViewModel> _files = [];
     private int _loadVersion;
+    private bool _disposed;
 
     public InfoPanelViewModel(MessagingContext context, ChatRowViewModel row, Action<long> jumpTo, Action searchInChat, Func<string, Task> copy)
     {
@@ -241,6 +245,7 @@ public sealed partial class InfoPanelViewModel : ObservableObject
         var version = ++_loadVersion;
         IsLoadingAttachments = true;
         Attachments.Clear();
+        ReleaseFiles();
         OnPropertyChanged(nameof(HasNoAttachments));
         try
         {
@@ -251,7 +256,7 @@ public sealed partial class InfoPanelViewModel : ObservableObject
                 _ => MessageSearchKind.Files,
             };
             var page = await _context.Search.SearchChatMessagesAsync(ChatId, string.Empty, kind, limit: 30);
-            if (version != _loadVersion)
+            if (version != _loadVersion || _disposed)
                 return;
 
             foreach (var message in page.Messages)
@@ -287,16 +292,10 @@ public sealed partial class InfoPanelViewModel : ObservableObject
         switch (message.Content)
         {
             case TdApi.MessageContent.MessageDocument { Document: { } doc }:
-            {
-                var file = new FileContentViewModel(_context, doc.Document_, doc.FileName, null);
-                return new AttachmentViewModel(file.Extension, file.FileName, $"{file.Size} · {when}", () => file.OpenCommand.ExecuteAsync(null));
-            }
+                return FileAttachment(new FileContentViewModel(_context, doc.Document_, doc.FileName, null), when);
 
             case TdApi.MessageContent.MessageAudio { Audio: { } audio }:
-            {
-                var file = new FileContentViewModel(_context, audio.Audio_, audio.FileName, null);
-                return new AttachmentViewModel(file.Extension, file.FileName, $"{file.Size} · {when}", () => file.OpenCommand.ExecuteAsync(null));
-            }
+                return FileAttachment(new FileContentViewModel(_context, audio.Audio_, audio.FileName, null), when);
 
             case TdApi.MessageContent.MessagePhoto { Photo: { } photo }:
             {
@@ -321,6 +320,26 @@ public sealed partial class InfoPanelViewModel : ObservableObject
         }
     }
 
+    private AttachmentViewModel FileAttachment(FileContentViewModel file, string when)
+    {
+        _files.Add(file);
+        return new AttachmentViewModel(file.Extension, file.FileName, $"{file.Size} · {when}", () => file.OpenCommand.ExecuteAsync(null));
+    }
+
+    private void ReleaseFiles()
+    {
+        foreach (var file in _files)
+            file.Dispose();
+        _files.Clear();
+    }
+
     private static string? FirstUrl(TdApi.FormattedText? text) =>
         TextContentViewModel.Parse(text).FirstOrDefault(s => s.IsLink)?.Url;
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _loadVersion++;
+        ReleaseFiles();
+    }
 }

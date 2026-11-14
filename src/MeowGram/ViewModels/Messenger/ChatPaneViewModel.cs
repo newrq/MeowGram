@@ -57,6 +57,9 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
     private bool _loadingOlder;
     private bool _loadingNewer;
     private bool _disposed;
+
+    // Растёт при каждой очистке ленты: ответы TDLib, запрошенные до неё, относятся к другому участку истории.
+    private int _feedVersion;
     private IReadOnlyList<long> _searchHits = [];
 
     public ChatPaneViewModel(MessagingContext context, ChatRows rows, long chatId, IPaneHost host)
@@ -70,6 +73,7 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
 
         _context.Messages.Changed += OnMessageEvent;
         _context.Store.ChatChanged += OnChatChanged;
+        _context.Store.GroupChanged += OnGroupChanged;
         Row.PropertyChanged += OnRowChanged;
     }
 
@@ -114,10 +118,7 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         var reply = ReplyTo?.MessageId ?? 0;
         ReplyTo = null;
         if (HasNewer)
-        {
-            ClearMessages();
-            await Safe(LoadLatestAsync);
-        }
+            await Safe(() => LoadLatestAsync(replace: true));
 
         foreach (var path in paths)
         {
@@ -188,8 +189,8 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
 
     public string ComposerContextText => Editing?.PlainText ?? ReplyTo?.Text ?? string.Empty;
 
-    /// <summary>В канале без прав писать поле ввода не показывается.</summary>
-    public bool CanWrite => _context.Store.GetChat(ChatId)?.Permissions?.CanSendBasicMessages != false || !IsChannel;
+    /// <summary>Без права писать (канал без прав публикации, ограничение в группе) поле ввода не показывается.</summary>
+    public bool CanWrite => _context.Store.CanSendMessages(ChatId);
 
     // ── Кнопка «вниз» ─────────────────────────────────────────────────
 
@@ -262,10 +263,13 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
             return;
 
         _loadingOlder = true;
+        var version = _feedVersion;
         try
         {
             var oldest = _messages[0].Id;
             var page = await _context.Messages.GetHistoryAsync(ChatId, oldest, 0, PageSize);
+            if (IsStale(version))
+                return;
             var added = AddMessages(page.Where(m => m.Id < oldest));
             if (added == 0)
                 HasOlder = false;
@@ -273,7 +277,8 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         }
         catch (Exception ex) when (ex is TdException or InvalidOperationException)
         {
-            HasOlder = false;
+            if (!IsStale(version))
+                HasOlder = false;
         }
         finally
         {
@@ -288,10 +293,13 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
             return;
 
         _loadingNewer = true;
+        var version = _feedVersion;
         try
         {
             var newest = _messages[^1].Id;
             var page = await _context.Messages.GetHistoryAsync(ChatId, newest, -(PageSize - 1), PageSize);
+            if (IsStale(version))
+                return;
             var added = AddMessages(page.Where(m => m.Id > newest));
             var lastId = _context.Store.GetChat(ChatId)?.LastMessage?.Id ?? 0;
             if (added == 0 || _messages[^1].Id >= lastId)
@@ -300,7 +308,8 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         }
         catch (Exception ex) when (ex is TdException or InvalidOperationException)
         {
-            SetHasNewer(false);
+            if (!IsStale(version))
+                SetHasNewer(false);
         }
         finally
         {
@@ -329,12 +338,12 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
 
         try
         {
-            ClearMessages();
-            await LoadAroundAsync(messageId, highlight: true);
+            // Лента очищается только когда новая страница уже пришла: при ошибке остаёмся где были.
+            await LoadAroundAsync(messageId, highlight: true, replace: true);
         }
         catch (Exception ex) when (ex is TdException or InvalidOperationException)
         {
-            // Сообщение удалено — остаёмся где были.
+            // Нет сети или сессия закрыта — лента не тронута.
         }
     }
 
@@ -343,9 +352,8 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
     {
         if (HasNewer)
         {
-            ClearMessages();
             _unreadAfterId = 0;
-            await Safe(LoadLatestAsync);
+            await Safe(() => LoadLatestAsync(replace: true));
         }
 
         ScrollRequested?.Invoke(null);
@@ -385,10 +393,7 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         _initialDraft = string.Empty;
         _initialDraftReply = 0;
         if (HasNewer)
-        {
-            ClearMessages();
-            await Safe(LoadLatestAsync);
-        }
+            await Safe(() => LoadLatestAsync(replace: true));
 
         await Safe(() => _context.Messages.SendTextAsync(ChatId, text, reply));
         ScrollRequested?.Invoke(null);
@@ -470,6 +475,14 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         if (message is null)
             return;
 
+        // Без диалога подтверждения у всех удаляются только свои сообщения: в личке TDLib иначе
+        // удалит и полученное сообщение у собеседника. Чужие — только у себя.
+        if (!message.IsOutgoing)
+        {
+            await Safe(() => _context.Messages.DeleteAsync(ChatId, [message.Id], forEveryone: false));
+            return;
+        }
+
         try
         {
             await _context.Messages.DeleteAsync(ChatId, [message.Id], forEveryone: true);
@@ -480,7 +493,7 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         }
         catch (TdException)
         {
-            // Удалить у всех нельзя (чужое сообщение, старое) — удаляем у себя.
+            // Удалить у всех нельзя (старое сообщение) — удаляем у себя.
             await Safe(() => _context.Messages.DeleteAsync(ChatId, [message.Id], forEveryone: false));
         }
     }
@@ -578,19 +591,33 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
 
     // ── Загрузка ──────────────────────────────────────────────────────
 
-    private async Task LoadLatestAsync()
+    /// <param name="replace">Заменить текущую ленту (после ответа TDLib, чтобы при ошибке лента осталась).</param>
+    private async Task LoadLatestAsync(bool replace = false)
     {
+        var version = _feedVersion;
+        var first = await _context.Messages.GetHistoryAsync(ChatId, 0, 0, PageSize);
+        if (IsStale(version))
+            return;
+        if (replace)
+        {
+            ClearMessages();
+            version = _feedVersion;
+        }
+
         SetHasNewer(false);
         HasOlder = true;
+        AddMessages(first);
+
         // TDLib с первого раза может отдать только последнее сообщение из кэша — повторяем, пока не наберётся страница.
-        for (var attempt = 0; attempt < 4 && _messages.Count < 30; attempt++)
+        for (var attempt = 1; attempt < 4 && _messages.Count < 30; attempt++)
         {
             var from = _messages.Count > 0 ? _messages[0].Id : 0;
             var page = await _context.Messages.GetHistoryAsync(ChatId, from, 0, PageSize);
+            if (IsStale(version))
+                return;
             if (AddMessages(page) == 0)
             {
-                if (attempt > 0)
-                    HasOlder = false;
+                HasOlder = false;
                 if (from != 0)
                     break;
             }
@@ -600,10 +627,16 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         ScrollRequested?.Invoke(null);
     }
 
-    private async Task LoadAroundAsync(long messageId, bool highlight, FeedItemViewModel? scrollTo = null)
+    private async Task LoadAroundAsync(long messageId, bool highlight, FeedItemViewModel? scrollTo = null, bool replace = false)
     {
-        HasOlder = true;
+        var version = _feedVersion;
         var page = await _context.Messages.GetHistoryAsync(ChatId, messageId, -(PageSize / 2), PageSize);
+        if (IsStale(version))
+            return;
+        if (replace)
+            ClearMessages();
+
+        HasOlder = true;
         AddMessages(page);
         var lastId = _context.Store.GetChat(ChatId)?.LastMessage?.Id ?? 0;
         SetHasNewer(_messages.Count > 0 && _messages[^1].Id < lastId);
@@ -642,12 +675,16 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
 
     private void ClearMessages()
     {
+        _feedVersion++;
         foreach (var vm in _messages)
             vm.Dispose();
         _messages.Clear();
         _byId.Clear();
         Items.Clear();
     }
+
+    /// <summary>Ответ пришёл после очистки ленты (переход, «вниз») или закрытия окна — его не применяем.</summary>
+    private bool IsStale(int version) => version != _feedVersion || _disposed;
 
     private void SetHasNewer(bool value)
     {
@@ -839,6 +876,8 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
                 vm.Update(replaced.Message);
                 if (!_byId.ContainsKey(vm.Id))
                     Insert(vm);
+                else
+                    vm.Dispose(); // Отправленное уже пришло отдельным обновлением — временное больше не нужно.
                 RebuildFeed();
                 break;
 
@@ -898,6 +937,20 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
 
         OnPropertyChanged(nameof(UnreadCount));
         OnPropertyChanged(nameof(HasUnreadBadge));
+        OnPropertyChanged(nameof(CanWrite));
+    }
+
+    /// <summary>Изменилась группа чата (свой статус, права) — могло измениться право писать.</summary>
+    private void OnGroupChanged(long groupId)
+    {
+        var isOurs = _context.Store.GetChat(ChatId)?.Type switch
+        {
+            TdApi.ChatType.ChatTypeSupergroup s => s.SupergroupId == groupId,
+            TdApi.ChatType.ChatTypeBasicGroup b => b.BasicGroupId == groupId,
+            _ => false,
+        };
+        if (isOurs)
+            OnPropertyChanged(nameof(CanWrite));
     }
 
     private void OnRowChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -954,6 +1007,7 @@ public sealed partial class ChatPaneViewModel : ObservableObject, IAsyncDisposab
         _disposed = true;
         _context.Messages.Changed -= OnMessageEvent;
         _context.Store.ChatChanged -= OnChatChanged;
+        _context.Store.GroupChanged -= OnGroupChanged;
         Row.PropertyChanged -= OnRowChanged;
 
         var text = Editing is null ? ComposerText : string.Empty;

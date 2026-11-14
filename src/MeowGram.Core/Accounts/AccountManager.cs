@@ -202,6 +202,8 @@ public sealed class AccountManager : IAsyncDisposable
         }
 
         AccountsChanged?.Invoke(this, EventArgs.Empty);
+        // Активный аккаунт мог смениться (или исчезнуть): главное окно должно уйти с закрытой сессии.
+        ActiveSessionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private async Task<TelegramSession> StartSessionAsync(string accountId, CancellationToken cancellationToken)

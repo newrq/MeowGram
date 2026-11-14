@@ -52,7 +52,9 @@ public sealed class FileService(ITdExecutor td)
                 return running;
 
             var task = DownloadCoreAsync(file.Id, priority);
-            _running[file.Id] = task;
+            // Запрос мог завершиться синхронно (сессия закрыта) — тогда finally уже отработал, кэшировать нечего.
+            if (!task.IsCompleted)
+                _running[file.Id] = task;
             return task;
         }
     }
@@ -102,8 +104,9 @@ public sealed class FileService(ITdExecutor td)
                 _done[fileId] = file.Local.Path;
             return file.Local.Path;
         }
-        catch (TdException)
+        catch (Exception ex) when (ex is TdException or InvalidOperationException)
         {
+            // InvalidOperationException — сессию уже закрыли (выход, смена аккаунта).
             return null;
         }
         finally

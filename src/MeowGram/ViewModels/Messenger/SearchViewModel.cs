@@ -331,13 +331,15 @@ public sealed partial class SearchViewModel : ObservableObject
         var pos = 0;
         while (pos < text.Length)
         {
-            var at = compare.IndexOf(text, query, pos, CompareOptions.IgnoreCase);
-            if (at < 0)
+            // Длина совпадения по правилам культуры может отличаться от длины запроса (ß ↔ ss, мягкие переносы).
+            var found = compare.IndexOf(text.AsSpan(pos), query.AsSpan(), CompareOptions.IgnoreCase, out var length);
+            if (found < 0 || length == 0)
                 break;
+            var at = pos + found;
             if (at > pos)
                 result.Add(new TextSegment(text[pos..at], false));
-            result.Add(new TextSegment(text.Substring(at, query.Length), true));
-            pos = at + query.Length;
+            result.Add(new TextSegment(text.Substring(at, length), true));
+            pos = at + length;
         }
 
         if (pos < text.Length)

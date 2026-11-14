@@ -168,6 +168,35 @@ public sealed class ChatStore
         return _scopeMuteFor.GetValueOrDefault(scope) > 0;
     }
 
+    /// <summary>
+    /// Можно ли писать в чат: в канале — владельцу и админам с правом публикации, в группе — по своим
+    /// ограничениям или общим правам участников, в личке — всегда.
+    /// </summary>
+    public bool CanSendMessages(long chatId)
+    {
+        if (!_chats.TryGetValue(chatId, out var chat))
+            return true;
+
+        return chat.Type switch
+        {
+            TdApi.ChatType.ChatTypeSupergroup s => CanSendAs(GetSupergroup(s.SupergroupId)?.Status, chat.Permissions, s.IsChannel),
+            TdApi.ChatType.ChatTypeBasicGroup b => CanSendAs(GetBasicGroup(b.BasicGroupId)?.Status, chat.Permissions, isChannel: false),
+            _ => true,
+        };
+    }
+
+    private static bool CanSendAs(TdApi.ChatMemberStatus? status, TdApi.ChatPermissions? defaults, bool isChannel) => status switch
+    {
+        // Группа ещё не пришла от TDLib: в группе поле не прячем, в канале не показываем.
+        null => !isChannel,
+        TdApi.ChatMemberStatus.ChatMemberStatusCreator => true,
+        TdApi.ChatMemberStatus.ChatMemberStatusAdministrator admin => !isChannel || admin.Rights?.CanPostMessages == true,
+        _ when isChannel => false,
+        TdApi.ChatMemberStatus.ChatMemberStatusRestricted restricted => restricted.Permissions?.CanSendBasicMessages == true,
+        TdApi.ChatMemberStatus.ChatMemberStatusLeft or TdApi.ChatMemberStatus.ChatMemberStatusBanned => false,
+        _ => defaults?.CanSendBasicMessages != false,
+    };
+
     /// <summary>Действия, которые ещё идут (старше <see cref="ActionLifetime"/> отбрасываются).</summary>
     public IReadOnlyList<ChatActionInfo> GetActions(long chatId)
     {
@@ -244,6 +273,10 @@ public sealed class ChatStore
 
             case TdApi.Update.UpdateChatIsMarkedAsUnread u:
                 Mutate(u.ChatId, c => c.IsMarkedAsUnread = u.IsMarkedAsUnread);
+                break;
+
+            case TdApi.Update.UpdateChatPermissions u:
+                Mutate(u.ChatId, c => c.Permissions = u.Permissions);
                 break;
 
             case TdApi.Update.UpdateChatNotificationSettings u:

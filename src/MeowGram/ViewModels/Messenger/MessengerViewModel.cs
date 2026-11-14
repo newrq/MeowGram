@@ -36,6 +36,10 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
     private readonly ISettingsStore _settings;
     private readonly MainViewModel _main;
 
+    // Растёт при каждой смене аккаунта: подключает контекст только последний обработчик.
+    private int _attachVersion;
+    private bool _disposed;
+
     public MessengerViewModel(MessagingHub hub, AccountManager accounts, ISettingsStore settings, MainViewModel main)
     {
         _hub = hub;
@@ -229,12 +233,14 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
     {
         if (Info?.ChatId == pane.ChatId)
         {
-            Info = null;
+            SetInfo(null);
         }
         else
         {
             Focus(pane);
-            Info = CreateInfo(pane);
+            // Панель следует за активным окном: фокус мог уже открыть её для этого чата.
+            if (Info?.ChatId != pane.ChatId)
+                SetInfo(CreateInfo(pane));
         }
 
         RaiseInfo();
@@ -245,8 +251,17 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
     [RelayCommand]
     private void CloseInfo()
     {
-        Info = null;
+        SetInfo(null);
         RaiseInfo();
+    }
+
+    /// <summary>Сменить инфо-панель, освободив прежнюю (она подписана на загрузки файлов).</summary>
+    private void SetInfo(InfoPanelViewModel? next)
+    {
+        var previous = Info;
+        Info = next;
+        if (previous is not null && !ReferenceEquals(previous, next))
+            previous.Dispose();
     }
 
     // ── Жизненный цикл ────────────────────────────────────────────────
@@ -282,20 +297,22 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
         await split.RestoreAsync();
     }
 
+    /// <summary>
+    /// Отключить контекст: сначала синхронно отвязать всё от экрана и событий ядра, потом сохранить черновики
+    /// окон. Повторный вызов во время ожидания уже ничего не находит и не освобождает дважды.
+    /// </summary>
     private async Task DetachAsync()
     {
-        Info = null;
+        SetInfo(null);
+        OnPropertyChanged(nameof(IsInfoOpen));
         ForwardPicker = null;
         IsSearchOpen = false;
         if (Context is { } context)
             context.Store.UserChanged -= OnUserChanged;
 
+        var panes = Split?.Panes.ToArray() ?? [];
         if (Split is { } split)
-        {
             split.PropertyChanged -= OnSplitChanged;
-            foreach (var pane in split.Panes)
-                await pane.DisposeAsync();
-        }
 
         ChatList?.Dispose();
         Rows?.Dispose();
@@ -304,14 +321,23 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
         ChatList = null;
         Rows = null;
         Context = null;
+        AccountPhoto = null;
+
+        foreach (var pane in panes)
+            await pane.DisposeAsync();
     }
 
     private async void OnCurrentChanged(object? sender, EventArgs e)
     {
-        if (ReferenceEquals(_hub.Current, Context))
+        var version = ++_attachVersion;
+        if (_disposed || ReferenceEquals(_hub.Current, Context))
             return;
 
         await DetachAsync();
+
+        // Пока окна сохраняли черновики, аккаунт могли сменить ещё раз или уйти с экрана.
+        if (version != _attachVersion || _disposed)
+            return;
         Attach(_hub.Current);
     }
 
@@ -323,7 +349,7 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
         // Инфо-панель следует за активным окном.
         if (e.PropertyName == nameof(SplitViewModel.ActivePane) && Info is not null)
         {
-            Info = Split?.ActivePane is { } active ? (Info.ChatId == active.ChatId ? Info : CreateInfo(active)) : null;
+            SetInfo(Split?.ActivePane is { } active ? (Info.ChatId == active.ChatId ? Info : CreateInfo(active)) : null);
             RaiseInfo();
         }
     }
@@ -367,7 +393,18 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
         AccountName = account?.DisplayName ?? string.Empty;
         AccountInitials = ChatText.Initials(AccountName);
         if (Context is { } context && context.Store.GetUser(context.Store.MyUserId)?.ProfilePhoto?.Small is { } photo)
-            ImageCache.LoadInto(context.Files, photo, FileService.PriorityAvatar, 96, bitmap => AccountPhoto = bitmap);
+        {
+            // Фото приходит асинхронно — не ставим его, если за это время переключились на другой аккаунт.
+            ImageCache.LoadInto(context.Files, photo, FileService.PriorityAvatar, 96, bitmap =>
+            {
+                if (ReferenceEquals(Context, context))
+                    AccountPhoto = bitmap;
+            });
+        }
+        else
+        {
+            AccountPhoto = null;
+        }
     }
 
     private void RefreshAccounts()
@@ -396,6 +433,7 @@ public sealed partial class MessengerViewModel : ViewModelBase, IPaneHost, IAsyn
     /// <summary>Уход с экрана (выход, вход в другой аккаунт): закрыть окна и сохранить черновики.</summary>
     public async ValueTask DisposeAsync()
     {
+        _disposed = true;
         _hub.CurrentChanged -= OnCurrentChanged;
         _accounts.AccountsChanged -= OnAccountsChanged;
         await DetachAsync();

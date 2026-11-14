@@ -81,6 +81,8 @@ public sealed partial class VoiceContentViewModel : MessageContentViewModel, IDi
 
     public bool ShowPaw3 => SpeedPaws >= 3;
 
+    partial void OnIsListenedChanged(bool value) => OnPropertyChanged(nameof(ShowUnlistened));
+
     partial void OnSpeedPawsChanged(int value)
     {
         OnPropertyChanged(nameof(ShowPaw2));
@@ -114,7 +116,6 @@ public sealed partial class VoiceContentViewModel : MessageContentViewModel, IDi
         if (!IsListened)
         {
             IsListened = true;
-            OnPropertyChanged(nameof(ShowUnlistened));
             try
             {
                 await _context.Messages.OpenContentAsync(_chatId, _messageId);
