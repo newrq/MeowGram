@@ -153,7 +153,7 @@ public sealed class CodeCellsLayer : Control
 {
     private readonly List<(char Digit, TimeSpan BornAt, double Tilt)> _digits = [];
     private readonly List<(char Digit, int Cell, TimeSpan DiedAt)> _dying = [];
-    private readonly Dictionary<char, FormattedText> _cache = [];
+    private readonly Dictionary<char, (FormattedText Text, Rect Ink)> _cache = [];
     private readonly Random _random = new();
     private readonly FrameClock _clock;
     private readonly BrushWatcher _brushes;
@@ -254,8 +254,9 @@ public sealed class CodeCellsLayer : Control
         if (opacity <= 0.001)
             return;
 
-        var text = GetText(digit);
-        var topLeft = new Point(cell.Center.X - text.Width / 2, cell.Center.Y - text.Height / 2);
+        // По центру ячейки — центр контура самой цифры, а не строки текста.
+        var (text, ink) = GetGlyph(digit);
+        var topLeft = new Point(cell.Center.X - ink.Center.X, cell.Center.Y - ink.Center.Y);
         var matrix = Matrix.CreateTranslation(-cell.Center.X, -cell.Center.Y)
                      * Matrix.CreateRotation(tiltDegrees * Math.PI / 180)
                      * Matrix.CreateTranslation(cell.Center.X, cell.Center.Y + offsetY);
@@ -282,15 +283,24 @@ public sealed class CodeCellsLayer : Control
         _cacheKey = key;
     }
 
-    private FormattedText GetText(char digit)
+    /// <summary>
+    /// Текст цифры и рамка её контура (относительно точки вывода текста). У Playfair Display над цифрами большой запас строки,
+    /// а цифры старостильные (3, 5 уходят ниже строки) — центрирование по высоте строки сажало их ниже центра ячейки.
+    /// </summary>
+    private (FormattedText Text, Rect Ink) GetGlyph(char digit)
     {
-        if (!_cache.TryGetValue(digit, out var text))
+        if (!_cache.TryGetValue(digit, out var glyph))
         {
-            text = new FormattedText(digit.ToString(), System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
+            var text = new FormattedText(digit.ToString(), System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
                 _cacheKey.Face, _cacheKey.Size, _cacheKey.Brush ?? Brushes.White);
-            _cache[digit] = text;
+            var ink = text.BuildGeometry(default)?.Bounds ?? default;
+            if (ink.Width <= 0 || ink.Height <= 0)
+                ink = new Rect(0, 0, text.Width, text.Height);
+
+            glyph = (text, ink);
+            _cache[digit] = glyph;
         }
 
-        return text;
+        return glyph;
     }
 }
