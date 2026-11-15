@@ -101,6 +101,14 @@
     <Style Selector="Border.bubble.out Ellipse.bean">
       <Setter Property="Fill" Value="{DynamicResource Mg.OutTextBrush}" />
     </Style>
+    <!-- Кнопки внутри пузыря (файл, цитата, превью ссылки, реакции) берут цвет текста пузыря:
+         тема Mg.SurfaceButton ставит Mg.TextBrush, и на светлом исходящем пузыре текст пропадал. -->
+    <Style Selector="Border.bubble Button">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.InTextBrush}" />
+    </Style>
+    <Style Selector="Border.bubble.out Button">
+      <Setter Property="Foreground" Value="{DynamicResource Mg.OutTextBrush}" />
+    </Style>
     <Style Selector="Grid.msg">
       <Setter Property="Margin" Value="0,0,0,3" />
     </Style>

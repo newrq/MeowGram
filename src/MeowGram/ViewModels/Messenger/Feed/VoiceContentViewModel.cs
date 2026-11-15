@@ -46,6 +46,7 @@ public sealed partial class VoiceContentViewModel : MessageContentViewModel, IDi
         Caption = new TextContentViewModel(voice.Caption, null);
         Beans = BuildBeans(voice.VoiceNote?.Waveform ?? []);
         VoicePlayer.Shared.StateChanged += OnPlayerChanged;
+        VoicePlayer.Shared.WarmUp();
         UpdateFromPlayer();
     }
 
@@ -106,13 +107,20 @@ public sealed partial class VoiceContentViewModel : MessageContentViewModel, IDi
         }
 
         IsLoading = true;
-        var path = await _context.Files.DownloadAsync(_file, FileService.PriorityUser);
-        IsLoading = false;
-        if (path is null)
-            return;
+        try
+        {
+            var path = await _context.Files.DownloadAsync(_file, FileService.PriorityUser);
+            if (path is null)
+                return;
 
-        player.SetRate(Rates[_rateIndex]);
-        player.Play(Key, path);
+            player.SetRate(Rates[_rateIndex]);
+            await player.PlayAsync(Key, path);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+
         if (!IsListened)
         {
             IsListened = true;
